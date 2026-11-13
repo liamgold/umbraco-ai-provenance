@@ -15,6 +15,6 @@ Each mark records the AI provider and model.
 
 It works for agents in the Copilot chat, and for Automate workflows that are allowed to change content. Prompt suggestions that an editor applies in the browser are not marked automatically, because Umbraco.AI raises no event for them.
 
-Requires Umbraco 17.6 or later and Umbraco.AI 17.8 or later.
+Requires Umbraco 17.8.1 or later and Umbraco.AI 17.8 or later.
 
 Read the [full documentation on GitHub](https://github.com/liamgold/umbraco-ai-provenance#readme).

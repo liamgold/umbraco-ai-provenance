@@ -28,7 +28,7 @@ AI Provenance records where AI was involved in your Umbraco content, one propert
 
 | Package | Install it when | Needs |
 |---|---|---|
-| `Umbraco.Community.AIProvenance` | Always | Umbraco 17.6 or later |
+| `Umbraco.Community.AIProvenance` | Always | Umbraco 17.8.1 or later |
 | `Umbraco.Community.AIProvenance.UmbracoAI` | You use Umbraco.AI agents and want their changes marked automatically | Umbraco.AI 17.8 or later, which it installs |
 
 ```sh
