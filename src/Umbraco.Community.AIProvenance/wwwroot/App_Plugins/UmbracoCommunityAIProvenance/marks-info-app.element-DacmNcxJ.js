@@ -1,7 +1,7 @@
 import { html as i, repeat as v, nothing as f, css as y, state as _, customElement as g } from "@umbraco-cms/backoffice/external/lit";
 import { UmbLitElement as A } from "@umbraco-cms/backoffice/lit-element";
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT as C } from "@umbraco-cms/backoffice/document";
-import { A as M } from "./document-marks.context-CAMkHUWk.js";
+import { A as M } from "./document-marks.context-qgeU_C77.js";
 var P = Object.defineProperty, E = Object.getOwnPropertyDescriptor, h = (e) => {
   throw TypeError(e);
 }, m = (e, t, a, n) => {
@@ -107,4 +107,4 @@ export {
   r as AipMarksInfoAppElement,
   T as default
 };
-//# sourceMappingURL=marks-info-app.element-dFgSU_LZ.js.map
+//# sourceMappingURL=marks-info-app.element-DacmNcxJ.js.map

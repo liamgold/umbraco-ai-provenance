@@ -12,7 +12,7 @@ const t = [
     type: "workspaceContext",
     name: "AI Provenance Document Marks Context",
     alias: "AiProvenance.WorkspaceContext.DocumentMarks",
-    api: () => import("./document-marks.context-CAMkHUWk.js").then((e) => e.d),
+    api: () => import("./document-marks.context-qgeU_C77.js").then((e) => e.d),
     conditions: [{ alias: a, match: n }]
   }
 ], o = "AiProvenance.Condition.MarkState", c = [
@@ -42,7 +42,7 @@ const t = [
     type: "condition",
     name: "AI Provenance Mark State Condition",
     alias: o,
-    api: () => import("./mark-state.condition-DxXJkut7.js")
+    api: () => import("./mark-state.condition-BVtU_UBr.js")
   },
   ...s.map(
     (e, i) => ({
@@ -50,7 +50,7 @@ const t = [
       kind: "default",
       alias: `AiProvenance.PropertyAction.${e.alias}`,
       name: `AI Provenance: ${e.alias}`,
-      api: () => import("./set-mark.property-action-oyvjVvbM.js"),
+      api: () => import("./set-mark.property-action-DqvEIOo_.js"),
       forPropertyEditorUis: c,
       weight: 50 - i,
       separatorBefore: i === 0 || i === 2,
@@ -67,7 +67,7 @@ const t = [
     type: "workspaceInfoApp",
     name: "AI Provenance Marks Info App",
     alias: "AiProvenance.WorkspaceInfoApp.Marks",
-    element: () => import("./marks-info-app.element-dFgSU_LZ.js"),
+    element: () => import("./marks-info-app.element-DacmNcxJ.js"),
     weight: 90,
     conditions: [
       { alias: a, match: n },

@@ -19,7 +19,7 @@ This roadmap lists the work for the first release, in order. Each phase ends wit
 - The Umbraco.AI integration is a separate package.
 - Rollback does not restore marks.
 
-## Phase 1: storage and core service
+## Phase 1: storage and core service (done)
 
 - Remove the template's example dashboard, API controller and view model.
 - Add a package migration plan, with an `AsyncMigrationBase` migration that creates the `aiProvenance` table (see [`design.md`](design.md#data-model)). `MigrationBase` is obsolete in Umbraco 17.
@@ -38,14 +38,14 @@ This roadmap lists the work for the first release, in order. Each phase ends wit
 
 **Acceptance:** integration tests cover set, get, remove, publish, unpublish, delete and copy, for invariant and variant content and for a property inside a block.
 
-## Phase 2: backoffice marking
+## Phase 2: backoffice marking (done, except the website check in Phase 3)
 
 - Replace the template's API controller with endpoints to get a document's draft marks, and to set or remove one property's mark. They require the same permission as updating the document (`ActionUpdate` through `ContentPermissionByResource`).
 - Add property actions: **Mark as AI generated**, **Mark as AI modified** and **Remove AI mark**.
   - List every supported property editor UI alias in `forPropertyEditorUis`, because the manifest has no wildcard.
   - Add a custom condition, so each property shows only the actions that apply to its current mark.
   - Show the current mark in the menu.
-  - Read the alias and variant from `UMB_PROPERTY_CONTEXT`, and the document key from `UMB_DOCUMENT_WORKSPACE_CONTEXT`. Inside a block, read the element key from `UMB_BLOCK_WORKSPACE_CONTEXT`.
+  - Read the alias and variant from `UMB_PROPERTY_CONTEXT`, and the document key from `UMB_DOCUMENT_WORKSPACE_CONTEXT`. Inside a block, the nearest `UMB_WORKSPACE_CONTEXT` is the block workspace (`Umb.Workspace.Block`), and its unique is the element key. The property data path does not contain the key.
 - Add a `workspaceInfoApp` that lists the document's marked properties in its Info view.
 - Refresh the marks when the editor switches culture or segment, or when a mark changes.
 
