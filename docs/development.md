@@ -41,6 +41,13 @@ The test site has a project reference to the package. Running the site builds th
 
 3. Log in to the backoffice with the credentials in `appsettings.json`.
 
+Before the first run, give the test site its own image-signing key in .NET user secrets. Otherwise, Umbraco generates one and writes it into `appsettings.json`, which is committed:
+
+```sh
+cd src/Umbraco.Community.AIProvenance.TestSite
+dotnet user-secrets set "Umbraco:CMS:Imaging:HMACSecretKey" "<a long random string>"
+```
+
 The test site uses [uSync](https://marketplace.umbraco.com/package/usync). It saves document types and other schema to disk, so test content types are in source control.
 
 ## Change the code
