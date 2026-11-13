@@ -1,0 +1,13 @@
+<Project>
+
+  <!-- Package versions for the test projects, on top of the solution's versions in src. -->
+  <Import Project="..\src\Directory.Packages.props" />
+
+  <ItemGroup>
+    <PackageVersion Include="Umbraco.Cms.Tests.Integration" Version="17.8.1" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.10.1" />
+    <PackageVersion Include="NUnit" Version="3.14.0" />
+    <PackageVersion Include="NUnit3TestAdapter" Version="4.6.0" />
+  </ItemGroup>
+
+</Project>

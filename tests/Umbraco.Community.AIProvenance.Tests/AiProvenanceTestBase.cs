@@ -1,0 +1,38 @@
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using NUnit.Framework;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Infrastructure.Install;
+using Umbraco.Cms.Tests.Integration.Testing;
+using Umbraco.Community.AIProvenance.Composers;
+using Umbraco.Community.AIProvenance.Migrations;
+using Umbraco.Community.AIProvenance.Services;
+
+namespace Umbraco.Community.AIProvenance.Tests;
+
+/// <summary>
+/// Starts Umbraco with the package registered and its table created.
+/// </summary>
+public abstract class AiProvenanceTestBase : UmbracoIntegrationTestWithContent
+{
+    protected IAiProvenanceService ProvenanceService => GetRequiredService<IAiProvenanceService>();
+
+    protected static Guid UserKey => Umbraco.Cms.Core.Constants.Security.SuperUserKey;
+
+    protected override void SetUpTestConfiguration(IConfigurationBuilder configBuilder)
+    {
+        base.SetUpTestConfiguration(configBuilder);
+        configBuilder.AddJsonFile(Path.Combine(TestContext.CurrentContext.TestDirectory, "appsettings.Tests.json"));
+    }
+
+    protected override void CustomTestSetup(IUmbracoBuilder builder)
+    {
+        // Umbraco's test host does not run composers, so register the package's services here.
+        new AiProvenanceComposer().Compose(builder);
+        builder.PackageMigrationPlans().Add<AiProvenanceMigrationPlan>();
+    }
+
+    [SetUp]
+    public async Task CreateTable() =>
+        await GetRequiredService<PackageMigrationRunner>().RunPackagePlansAsync([Constants.PackageId]);
+}
