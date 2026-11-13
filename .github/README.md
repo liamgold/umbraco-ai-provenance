@@ -130,12 +130,6 @@ Each content item gets an `aiProvenance` entry in its `properties`, with the mar
 
 The entry is inside `properties`, because the Delivery API does not accept extra fields beside them. Umbraco's extended webhooks include it too. Properties inside blocks are not included.
 
-To add the entry, the package replaces Umbraco's `IApiContentResponseBuilder`. Keep these points in mind:
-
-- Only one replacement of `IApiContentResponseBuilder` takes effect. If another package or your own code also replaces it, the last registration wins, and either the entry or the other change disappears.
-- The `fields` query parameter doesn't remove the entry. It lists every marked property, even ones that `fields` leaves out.
-- The entry replaces a content property with the alias `aiProvenance`. Don't give a property that alias, or set `AIProvenance:DeliveryApiEnabled` to `false`.
-
 ## Automatic marking with Umbraco.AI
 
 With `Umbraco.Community.AIProvenance.UmbracoAI` installed, the package marks each property that an Umbraco.AI agent changes:
