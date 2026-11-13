@@ -1,11 +1,32 @@
 ﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
 @{ Layout = null; }
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><title>@Model.Name</title></head>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@Model.Name</title>
+    <style>
+        body { font-family: system-ui, sans-serif; max-width: 40rem; margin: 3rem auto; padding: 0 1rem; line-height: 1.5; color: #1b264f; }
+        .origins { font-size: .875rem; color: #555; }
+
+        /* Example styles for the AI label. The package renders the markup without styles. */
+        .ai-label { display: inline-block; margin: .25rem 0 1rem; font-size: .8125rem; }
+        .ai-label__text { display: inline-block; cursor: pointer; list-style: none; padding: .125rem .625rem; border-radius: 999px; background: #eef0fb; color: #283a97; font-weight: 600; }
+        .ai-label__text::-webkit-details-marker { display: none; }
+        .ai-label--modified .ai-label__text { background: #fdf2e6; color: #8a4b0b; }
+        .ai-label__description { display: block; margin-top: .375rem; color: #555; }
+    </style>
+</head>
 <body>
-<h1>@Model.Name</h1>
-<p id="origin-summary">Summary origin: @Model.GetAiOrigin("summary")</p>
-<p id="origin-title">Title origin: @Model.GetAiOrigin("title")</p>
-<ai-label for="title"><h2 id="title">@Model.Value("title")</h2></ai-label>
-<ai-label for="summary" position="after"><p id="summary">@Model.Value("summary")</p></ai-label>
-</body></html>
+    <h1>@Model.Name</h1>
+    <p class="origins">
+        <code>GetAiOrigin("title")</code>: @Model.GetAiOrigin("title") ·
+        <code>GetAiOrigin("summary")</code>: @Model.GetAiOrigin("summary")
+    </p>
+
+    <ai-label for="title" position="after"><h2>@Model.Value("title")</h2></ai-label>
+    <ai-label for="summary" position="after"><p>@Model.Value("summary")</p></ai-label>
+    <ai-label for="bodyText" position="after">@Model.Value("bodyText")</ai-label>
+</body>
+</html>

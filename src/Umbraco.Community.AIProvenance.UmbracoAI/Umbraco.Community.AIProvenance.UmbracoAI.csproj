@@ -10,18 +10,19 @@
     <PackageId>Umbraco.Community.AIProvenance.UmbracoAI</PackageId>
     <Title>AI Provenance for Umbraco.AI</Title>
     <Description>Marks content as AI generated or AI modified automatically when Umbraco.AI agents change it. An add-on for Umbraco.Community.AIProvenance.</Description>
-    <PackageTags>umbraco</PackageTags>
+    <PackageTags>umbraco umbraco-ai ai ai-provenance ai-disclosure ai-label transparency</PackageTags>
     <Authors>Liam Goldfinch</Authors>
     <Copyright>$([System.DateTime]::UtcNow.ToString(`yyyy`)) © Liam Goldfinch</Copyright>
     <PackageProjectUrl>https://github.com/liamgold/umbraco-ai-provenance</PackageProjectUrl>
     <RepositoryUrl>https://github.com/liamgold/umbraco-ai-provenance</RepositoryUrl>
-    <PackageReadmeFile>README_nuget.md</PackageReadmeFile>
+    <PackageReadmeFile>README_nuget_UmbracoAI.md</PackageReadmeFile>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Umbraco.AI.Core" />
+    <!-- The full package, not Umbraco.AI.Core: Core alone does not register the services that its own types need. -->
+    <PackageReference Include="Umbraco.AI" />
   </ItemGroup>
 
   <ItemGroup>
@@ -33,7 +34,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\..\docs\README_nuget.md">
+    <None Include="..\..\docs\README_nuget_UmbracoAI.md">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>

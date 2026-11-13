@@ -89,7 +89,7 @@ Rolling back a document does not restore its marks. Umbraco's rollback notificat
 ### Umbraco.AI integration is a separate package
 
 - **`Umbraco.Community.AIProvenance`** has the marking, the backoffice, the Razor helpers and the Delivery API output. It does not reference Umbraco.AI, and it supports Umbraco 17.6 and later. Umbraco 17.6 added the published cultures to the publish notification, which keeps marks correct per language.
-- **`Umbraco.Community.AIProvenance.UmbracoAI`** adds automatic marking. It references `Umbraco.AI.Core` 17.8 or later, and needs the same Umbraco version as the main package.
+- **`Umbraco.Community.AIProvenance.UmbracoAI`** adds automatic marking. It depends on the full Umbraco.AI package, 17.8 or later, and needs the same Umbraco version as the main package. Installing it installs Umbraco.AI.
 
 Sites without Umbraco.AI install only the first package. Changes in Umbraco.AI only affect the add-on. The add-on can also move into Umbraco.AI itself later.
 

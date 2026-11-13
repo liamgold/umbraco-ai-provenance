@@ -1,0 +1,16 @@
+{
+  "$schema": "https://marketplace.umbraco.com/umbraco-marketplace-schema.json",
+  "AuthorDetails": {
+    "Name": "Liam Goldfinch",
+    "ImageUrl": "https://github.com/liamgold.png"
+  },
+  "Category": "Artificial Intelligence",
+  "Description": "An add-on for AI Provenance. When an Umbraco.AI agent changes content, it marks each changed property as AI generated or AI modified, and records the AI provider and model.",
+  "DocumentationUrl": "https://github.com/liamgold/umbraco-ai-provenance#automatic-marking-with-umbracoai",
+  "IsSubPackageOf": "Umbraco.Community.AIProvenance",
+  "IssueTrackerUrl": "https://github.com/liamgold/umbraco-ai-provenance/issues",
+  "LicenseTypes": [ "Free" ],
+  "PackageType": "Package",
+  "Tags": [ "ai", "ai provenance", "umbraco ai", "agents" ],
+  "Title": "AI Provenance for Umbraco.AI"
+}

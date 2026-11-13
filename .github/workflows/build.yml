@@ -1,0 +1,52 @@
+name: Build and test
+
+# Runs on every pull request and every push to main: builds the backoffice extension and the solution,
+# runs the tests, and packs both packages so a broken package shows up before a release.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: src/Umbraco.Community.AIProvenance/Client/package-lock.json
+
+      - name: Build the backoffice extension
+        working-directory: src/Umbraco.Community.AIProvenance/Client
+        run: |
+          npm ci
+          npm run build
+
+      - name: Build
+        run: dotnet build src/Umbraco.Community.AIProvenance.slnx -c Release
+
+      - name: Test
+        run: dotnet test tests/Umbraco.Community.AIProvenance.Tests -c Release --no-build --blame-hang-timeout 5m
+
+      - name: Pack
+        run: |
+          dotnet pack src/Umbraco.Community.AIProvenance/Umbraco.Community.AIProvenance.csproj -c Release --no-build -o artifacts
+          dotnet pack src/Umbraco.Community.AIProvenance.UmbracoAI/Umbraco.Community.AIProvenance.UmbracoAI.csproj -c Release --no-build -o artifacts
+
+      - name: Upload packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: packages
+          path: artifacts/*.nupkg

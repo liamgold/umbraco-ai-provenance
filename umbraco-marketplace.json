@@ -1,14 +1,24 @@
 {
-    "$schema": "https://marketplace.umbraco.com/umbraco-marketplace-schema.json", 
-    "AuthorDetails": {
-      "Name": "Liam Goldfinch",
-      "ImageUrl": "https://github.com/liamgold.png"
-    },
-    "Category": "",
-    "Description": "",
-    "LicenseTypes": [ "Free" ],
-    "IssueTrackerUrl": "https://github.com/liamgold/umbraco-ai-provenance/issues",
-    "PackageType": "Package",
-    "Tags": [],
-    "Title": "AI Provenance"
-  }
+  "$schema": "https://marketplace.umbraco.com/umbraco-marketplace-schema.json",
+  "AuthorDetails": {
+    "Name": "Liam Goldfinch",
+    "ImageUrl": "https://github.com/liamgold.png"
+  },
+  "Category": "Artificial Intelligence",
+  "AlternateCategory": "Editor Tools",
+  "Description": "Records where AI was involved in your content, property by property. Editors mark properties as AI generated or AI modified, Umbraco.AI agents' changes can be marked automatically, and your website and the Delivery API can show accessible AI labels.",
+  "DocumentationUrl": "https://github.com/liamgold/umbraco-ai-provenance#readme",
+  "IssueTrackerUrl": "https://github.com/liamgold/umbraco-ai-provenance/issues",
+  "LicenseTypes": [ "Free" ],
+  "PackageType": "Package",
+  "RelatedPackages": [
+    { "PackageId": "Umbraco.Community.AIProvenance.UmbracoAI", "Description": "Marks Umbraco.AI agents' changes automatically." }
+  ],
+  "Screenshots": [
+    { "ImageUrl": "https://raw.githubusercontent.com/liamgold/umbraco-ai-provenance/main/docs/screenshots/property-actions.png", "Caption": "Mark a property as AI generated or AI modified from its action menu." },
+    { "ImageUrl": "https://raw.githubusercontent.com/liamgold/umbraco-ai-provenance/main/docs/screenshots/info-view.png", "Caption": "The document's Info view lists its marked properties." },
+    { "ImageUrl": "https://raw.githubusercontent.com/liamgold/umbraco-ai-provenance/main/docs/screenshots/website-labels.png", "Caption": "Accessible AI labels on a website, rendered by the ai-label tag helper." }
+  ],
+  "Tags": [ "ai", "ai provenance", "ai disclosure", "ai label", "transparency", "eu ai act", "umbraco ai" ],
+  "Title": "AI Provenance"
+}

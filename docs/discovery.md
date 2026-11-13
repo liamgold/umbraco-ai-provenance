@@ -150,6 +150,7 @@ These would make automatic marking reliable. They are the basis for an issue on 
 ## Umbraco.AI behaviour found in testing
 
 - **Approval policy.** Write tools such as `set_umbraco_content_value` do not need approval (`RequiresApproval = false`). The interactive AG-UI stream, which the Copilot chat uses, runs them straight away. The non-interactive `/run` endpoint and Automate use `AIApprovalPolicy.DenyAll` by default, so they skip every write tool unless an agent or automation allows it ([`AIApprovalPolicy.cs`](https://github.com/umbraco/Umbraco.AI/blob/bca4f24c19ca1d2c4fea82dd955ee0b3f3416b23/Umbraco.AI.Agent/src/Umbraco.AI.Agent.Core/Agents/AIApprovalPolicy.cs)).
+- **Umbraco.AI.Core on its own.** A site with only `Umbraco.AI.Core` installed fails to start. Umbraco finds Core's property value converters, but their services, such as `IAIContextService`, are only registered by the full `Umbraco.AI` package. The add-on therefore depends on `Umbraco.AI`.
 - **Section access.** The Umbraco.AI management API requires the AI section in the access token's allowed-applications claim. Umbraco.AI adds the section to the Admin group on install, but users signed in before that get 403 until they sign out and in again.
 
 ## Community feedback
