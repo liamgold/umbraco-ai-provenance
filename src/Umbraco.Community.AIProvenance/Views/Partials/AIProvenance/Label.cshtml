@@ -1,0 +1,13 @@
+@using Umbraco.Community.AIProvenance.Models
+@model Umbraco.Community.AIProvenance.Rendering.AiLabelViewModel
+@*
+    The default AI label. To change the markup, create your own view at
+    Views/Partials/AIProvenance/Label.cshtml in your site. Your view replaces this one.
+
+    <details> shows the explanation on click, tap or keyboard, with no JavaScript,
+    and screen readers announce both the label and the explanation.
+*@
+<details class="ai-label ai-label--@(Model.Origin == AiOrigin.AiGenerated ? "generated" : "modified")" data-ai-origin="@Model.Origin">
+    <summary class="ai-label__text">@Model.Text</summary>
+    <span class="ai-label__description">@Model.Description</span>
+</details>

@@ -4,6 +4,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <StaticWebAssetBasePath>/</StaticWebAssetBasePath>
+    <!-- Compiles the MVC views in Views/, such as the AI label partial, into the package. -->
+    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -21,6 +23,11 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageIcon></PackageIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Lets the tests use internal types, such as the reader. -->
+    <InternalsVisibleTo Include="Umbraco.Community.AIProvenance.Tests" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Umbraco.Cms.Web.Website" />

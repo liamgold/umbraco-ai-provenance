@@ -38,7 +38,7 @@ This roadmap lists the work for the first release, in order. Each phase ends wit
 
 **Acceptance:** integration tests cover set, get, remove, publish, unpublish, delete and copy, for invariant and variant content and for a property inside a block.
 
-## Phase 2: backoffice marking (done, except the website check in Phase 3)
+## Phase 2: backoffice marking (done)
 
 - Replace the template's API controller with endpoints to get a document's draft marks, and to set or remove one property's mark. They require the same permission as updating the document (`ActionUpdate` through `ContentPermissionByResource`).
 - Add property actions: **Mark as AI generated**, **Mark as AI modified** and **Remove AI mark**.
@@ -51,13 +51,13 @@ This roadmap lists the work for the first release, in order. Each phase ends wit
 
 **Acceptance:** an editor can mark, change and remove a mark on a text property, a rich text property and a property inside a block. This works in the default culture and in a second culture. The menu and the Info view update straight away. After publishing, the website sees the mark.
 
-## Phase 3: reading the marks
+## Phase 3: reading the marks (done)
 
 - Add the Razor extension `GetAiOrigin("propertyAlias")` for the current culture, plus an overload that takes a culture.
 - Add the `<ai-label for="..." />` tag helper, with an optional `position` and child content:
   - It renders nothing when the property has no mark.
   - It renders "AI generated" or "AI modified", with a fuller explanation for screen readers and on hover or tap: "AI generated this content." or "Our editors wrote this content and edited it with AI."
-  - It uses the European Commission's icons for AI-generated and AI-modified content, after a check of their licence and usage guidance.
+  - It does not include the European Commission's AI icons, because their licence is unclear. Sites can add them in their own label view.
   - Sites can translate the text, and override the markup with a partial view such as `Views/Partials/AIProvenance/Label.cshtml`.
 - Add an `aiProvenance` entry to `properties` in the Content Delivery API output:
   - Subclass `ApiContentResponseBuilder`, and do the same for `IApiContentBuilder` and `IApiElementBuilder`.

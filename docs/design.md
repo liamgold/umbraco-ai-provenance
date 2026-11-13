@@ -127,13 +127,17 @@ A Razor extension returns a property's origin for the current culture:
 @if (Model.GetAiOrigin("summary") == AiOrigin.AiGenerated) { ... }
 ```
 
-A tag helper renders a label when the property carries a mark, and nothing when it does not:
+A tag helper renders a label when the property carries a mark. It renders only its own content when the property has no mark. Sites register it in `Views/_ViewImports.cshtml` with `@addTagHelper *, Umbraco.Community.AIProvenance`:
 
 ```cshtml
 <ai-label for="summary" />
+<ai-label for="summary" position="after"><p>@Model.Value("summary")</p></ai-label>
+<ai-label for="text" item="@block.Content">...</ai-label>
 ```
 
-The label shows "AI generated" or "AI modified", with a fuller explanation for screen readers and on hover or tap. Sites can translate the text and override the markup with a partial view.
+The label shows "AI generated" or "AI modified", with a fuller explanation that opens on click, tap or keyboard and that screen readers announce. Sites translate the text with dictionary items (`AIProvenance.AiGenerated`, `AIProvenance.AiGeneratedDescription`, `AIProvenance.AiModified` and `AIProvenance.AiModifiedDescription`). They override the markup with their own `Views/Partials/AIProvenance/Label.cshtml`.
+
+The package does not include the European Commission's AI icons. The Commission offers them for free use, but names no licence for them, and its legal notice excludes logos from its reuse policy. Sites can download the icons and add them to their own label view.
 
 The Content Delivery API adds the marked properties to each content item, as a reserved entry in `properties`:
 
@@ -148,7 +152,9 @@ The Content Delivery API adds the marked properties to each content item, as a r
 }
 ```
 
-The entry sits inside `properties` because the Delivery API does not accept extra fields beside them. Only marked properties appear. In preview, the output shows draft marks. A setting turns this output off.
+The entry sits inside `properties` because the Delivery API does not accept extra fields beside them. Only marked properties appear, in the request's culture. In preview, the output shows draft marks. Umbraco's extended webhooks use the same output, so their payloads include the entry too.
+
+The setting `AIProvenance:DeliveryApiEnabled` turns this output off. Properties inside blocks are not included, because a block's output does not know which document contains it.
 
 ## Umbraco versions
 

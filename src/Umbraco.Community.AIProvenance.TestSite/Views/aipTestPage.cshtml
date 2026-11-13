@@ -1,0 +1,11 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@{ Layout = null; }
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>@Model.Name</title></head>
+<body>
+<h1>@Model.Name</h1>
+<p id="origin-summary">Summary origin: @Model.GetAiOrigin("summary")</p>
+<p id="origin-title">Title origin: @Model.GetAiOrigin("title")</p>
+<ai-label for="title"><h2 id="title">@Model.Value("title")</h2></ai-label>
+<ai-label for="summary" position="after"><p id="summary">@Model.Value("summary")</p></ai-label>
+</body></html>
