@@ -17,6 +17,6 @@ To mark Umbraco.AI agents' changes automatically, also install [`Umbraco.Communi
 
 The package does not detect AI, and it does not make a site compliant with the EU AI Act. It records what editors mark and what Umbraco.AI agents write.
 
-Requires Umbraco 17.6 or later.
+Requires Umbraco 17.8.1 or later.
 
 Read the [full documentation on GitHub](https://github.com/liamgold/umbraco-ai-provenance#readme).
