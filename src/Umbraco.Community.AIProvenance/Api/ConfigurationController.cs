@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Common.Attributes;
 using Umbraco.Cms.Api.Common.Filters;
 using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Cms.Web.Common.Filters;
 using Umbraco.Cms.Web.Common.Routing;
 using Umbraco.Community.AIProvenance.Api.Models;
 
@@ -21,6 +22,8 @@ namespace Umbraco.Community.AIProvenance.Api;
 [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
 [MapToApi(Constants.ApiName)]
 [JsonOptionsName(Umbraco.Cms.Core.Constants.JsonOptionsNames.BackOffice)]
+[DisableBrowserCache]
+[Produces("application/json")]
 public sealed class ConfigurationController : ControllerBase
 {
     private readonly IOptionsMonitor<AiProvenanceSettings> _settings;
