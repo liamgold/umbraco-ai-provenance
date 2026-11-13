@@ -73,6 +73,24 @@ The test site uses [uSync](https://marketplace.umbraco.com/package/usync). It sa
   2. Add the folder as a NuGet source: `dotnet nuget add source c:\nuget.local`
   3. Install the package into a clean Umbraco 17 site and test it there.
 
+## Test automatic marking with a real model
+
+The test site includes Umbraco.AI, Agents, Copilot and the Microsoft Foundry provider. The integration tests simulate an agent run, so you only need a real model to check the whole flow.
+
+1. Store your provider's API key in user secrets, under `Umbraco:AI:Secrets`:
+
+   ```sh
+   cd src/Umbraco.Community.AIProvenance.TestSite
+   dotnet user-secrets set "Umbraco:AI:Secrets:FoundryApiKey" "<your key>"
+   ```
+
+2. Sign out of the backoffice and sign in again, so your access token includes the AI section.
+3. In the AI section, create a connection. For the API key, enter `$Umbraco:AI:Secrets:FoundryApiKey`. Umbraco.AI reads the key from configuration, so the database stores only the reference.
+4. Create a profile for a chat model deployment, and an agent with the `get_umbraco_content` and `set_umbraco_content_value` tools.
+5. Ask the agent in the Copilot chat to change a property. The property's action menu and the Info view then show the mark, with source `UmbracoAI`.
+
+The non-interactive `/run` endpoint skips write tools by default, so use the Copilot chat or the interactive stream.
+
 ## Umbraco versions and branches
 
 - `main` targets **Umbraco 17**, the current Long Term Support (LTS) version.

@@ -67,7 +67,7 @@ This roadmap lists the work for the first release, in order. Each phase ends wit
 
 **Acceptance:** a published, marked property shows its label through the tag helper, and appears in the Delivery API response. An unmarked property shows neither. Unit tests cover the extension method and the tag helper output.
 
-## Phase 4: automatic marking with Umbraco.AI
+## Phase 4: automatic marking with Umbraco.AI (done)
 
 - Add the project `src/Umbraco.Community.AIProvenance.UmbracoAI`, packed as its own NuGet package. It references `Umbraco.AI.Core` 17.8 or later. Nothing else in the solution references Umbraco.AI.
 - Add a `ContentSavingNotification` handler. When `IAIRuntimeContextAccessor.Context` is not null:
