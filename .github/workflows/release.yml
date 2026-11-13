@@ -1,7 +1,7 @@
 name: Publish to NuGet
 
-# Runs when a GitHub release is published. The release's tag is the package version,
-# for example 17.0.0 or 17.0.0-beta.1. It builds and tests both packages, then publishes them.
+# Runs when a GitHub release is published. The release's tag, without a leading "v", is the package version,
+# for example v17.0.0-beta.1 gives 17.0.0-beta.1. It builds and tests both packages, then publishes them.
 #
 # It publishes with NuGet Trusted Publishing, so no API key is stored in the repository. nuget.org needs
 # a trusted publishing policy for this repository with the workflow file release.yml.
@@ -19,11 +19,14 @@ jobs:
   publish:
     runs-on: ubuntu-latest
 
-    env:
-      VERSION: ${{ github.event.release.tag_name }}
-
     steps:
       - uses: actions/checkout@v7
+
+      # The tag is the version, with or without a leading "v": v17.0.0-beta.1 and 17.0.0-beta.1 both give 17.0.0-beta.1.
+      - name: Read the version from the release tag
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        run: echo "VERSION=${TAG#v}" >> "$GITHUB_ENV"
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v6
