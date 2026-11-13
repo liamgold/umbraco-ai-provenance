@@ -66,7 +66,7 @@ The test site uses [uSync](https://marketplace.umbraco.com/package/usync). It sa
 
 ## Test
 
-- **Automated tests:** run `dotnet test` from `src`. The integration tests use `Umbraco.Cms.Tests.Integration` and start Umbraco with a real database.
+- **Automated tests:** run `dotnet test` from `src`. The integration tests use `Umbraco.Cms.Tests.Integration` and start Umbraco with a real database. They use SQLite by default. To run them against SQL Server LocalDB, set the environment variable `Tests__Database__DatabaseType` to `LocalDb`.
 - **Manual tests:** use the test site.
 - **The NuGet package:** before a release, check the package itself, because a project reference cannot show a missing file:
   1. Pack it to a local folder: `dotnet pack -c Release /p:Version=0.0.1 -o c:\nuget.local`

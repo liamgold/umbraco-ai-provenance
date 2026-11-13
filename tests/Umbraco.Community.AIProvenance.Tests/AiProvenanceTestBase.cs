@@ -23,6 +23,10 @@ public abstract class AiProvenanceTestBase : UmbracoIntegrationTestWithContent
     {
         base.SetUpTestConfiguration(configBuilder);
         configBuilder.AddJsonFile(Path.Combine(TestContext.CurrentContext.TestDirectory, "appsettings.Tests.json"));
+
+        // Environment variables override the file, so a run can switch database:
+        // Tests__Database__DatabaseType=LocalDb runs the tests against SQL Server LocalDB.
+        configBuilder.AddEnvironmentVariables();
     }
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
