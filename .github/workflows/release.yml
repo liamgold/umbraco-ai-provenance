@@ -1,42 +1,32 @@
-name: Release packages
+name: Publish to NuGet
 
-# Runs when a version tag is pushed, for example 17.0.0 or 17.0.0-beta1. It builds and tests both packages,
-# then publishes them to NuGet with the tag as their version.
+# Runs when a GitHub release is published. The release's tag is the package version,
+# for example 17.0.0 or 17.0.0-beta.1. It builds and tests both packages, then publishes them.
 #
-# It publishes with NuGet Trusted Publishing, so no long-lived API key is stored in the repository.
-# GitHub issues a short-lived token for this run, nuget.org checks it against the trusted publishing
-# policy for this repository and this workflow file, and returns an API key that lasts one hour.
+# It publishes with NuGet Trusted Publishing, so no API key is stored in the repository. nuget.org needs
+# a trusted publishing policy for this repository with the workflow file release.yml.
 # https://learn.microsoft.com/nuget/nuget-org/trusted-publishing
-#
-# One-off setup:
-#   1. On nuget.org: your username > Trusted Publishing > add a policy with
-#        Repository Owner: liamgold    Repository: umbraco-ai-provenance    Workflow File: release.yml
-#   2. In this repository: Settings > Secrets and variables > Actions > add the secret NUGET_USER,
-#      set to your nuget.org username (the profile name, not your email address)
 
 on:
-  push:
-    tags:
-      - '[0-9]+.[0-9]+.[0-9]+'
-      - '[0-9]+.[0-9]+.[0-9]+-*'
+  release:
+    types: [published]
+
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
-  release:
+  publish:
     runs-on: ubuntu-latest
 
-    permissions:
-      contents: read
-      id-token: write  # lets this job ask GitHub for the token that nuget.org checks
-
     env:
-      VERSION: ${{ github.ref_name }}
+      VERSION: ${{ github.event.release.tag_name }}
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v6
         with:
           dotnet-version: 10.0.x
 
@@ -61,22 +51,21 @@ jobs:
           npm run build
 
       - name: Build
-        run: dotnet build src/Umbraco.Community.AIProvenance.slnx -c Release /p:Version=$VERSION
+        run: dotnet build src/Umbraco.Community.AIProvenance.slnx --configuration Release -p:Version=$VERSION
 
       - name: Test
-        run: dotnet test tests/Umbraco.Community.AIProvenance.Tests -c Release --no-build --blame-hang-timeout 5m
+        run: dotnet test tests/Umbraco.Community.AIProvenance.Tests --configuration Release --no-build --blame-hang-timeout 5m
 
       - name: Pack
         run: |
-          dotnet pack src/Umbraco.Community.AIProvenance/Umbraco.Community.AIProvenance.csproj -c Release --no-build -o artifacts /p:Version=$VERSION
-          dotnet pack src/Umbraco.Community.AIProvenance.UmbracoAI/Umbraco.Community.AIProvenance.UmbracoAI.csproj -c Release --no-build -o artifacts /p:Version=$VERSION
+          dotnet pack src/Umbraco.Community.AIProvenance/Umbraco.Community.AIProvenance.csproj --configuration Release --no-build --output nupkg -p:Version=$VERSION
+          dotnet pack src/Umbraco.Community.AIProvenance.UmbracoAI/Umbraco.Community.AIProvenance.UmbracoAI.csproj --configuration Release --no-build --output nupkg -p:Version=$VERSION
 
-      # Ask for the key just before pushing: it is only valid for one hour.
-      - name: NuGet login (exchange the GitHub token for a short-lived API key)
+      - name: NuGet login (OIDC)
         uses: NuGet/login@v1
-        id: login
+        id: nuget_login
         with:
-          user: ${{ secrets.NUGET_USER }}
+          user: liamgold
 
-      - name: Push to NuGet
-        run: dotnet nuget push "artifacts/*.nupkg" -k ${{ steps.login.outputs.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json --skip-duplicate
+      - name: Publish to NuGet using Trusted Publishing
+        run: dotnet nuget push "nupkg/*.nupkg" --api-key "${{ steps.nuget_login.outputs.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
