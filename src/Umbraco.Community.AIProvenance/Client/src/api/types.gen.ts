@@ -4,100 +4,94 @@ export type ClientOptions = {
     baseUrl: 'https://localhost:44396' | (string & {});
 };
 
-export type WhoAmIResponseModel = {
-    name: string | null;
-    email: string;
-    groups: Array<string>;
+export type AiOrigin = 'None' | 'AiGenerated' | 'AiModified';
+
+export type AiProvenanceSource = 'Manual' | 'UmbracoAI';
+
+export type MarkResponseModel = {
+    propertyAlias: string;
+    culture?: string | null;
+    segment?: string | null;
+    elementKey?: string | null;
+    origin: AiOrigin;
+    source: AiProvenanceSource;
+    aiProvider?: string | null;
+    aiModel?: string | null;
+    updatedUtc: string;
 };
 
-export type GetPingData = {
+export type SetMarkRequestModel = {
+    propertyAlias: string;
+    culture?: string | null;
+    segment?: string | null;
+    elementKey?: string | null;
+    origin: AiOrigin;
+};
+
+export type GetDocumentByIdMarksData = {
     body?: never;
-    path?: never;
+    path: {
+        id: string;
+    };
     query?: never;
-    url: '/umbraco/umbracocommunityaiprovenance/api/v1/ping';
+    url: '/umbraco/umbracocommunityaiprovenance/api/v1/document/{id}/marks';
 };
 
-export type GetPingErrors = {
+export type GetDocumentByIdMarksErrors = {
     /**
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: unknown;
 };
 
-export type GetPingResponses = {
+export type GetDocumentByIdMarksResponses = {
     /**
      * OK
      */
-    200: string;
+    200: Array<MarkResponseModel>;
 };
 
-export type GetPingResponse = GetPingResponses[keyof GetPingResponses];
+export type GetDocumentByIdMarksResponse = GetDocumentByIdMarksResponses[keyof GetDocumentByIdMarksResponses];
 
-export type GetWhatsMyNameData = {
-    body?: never;
-    path?: never;
+export type PutDocumentByIdMarksData = {
+    body?: SetMarkRequestModel;
+    path: {
+        id: string;
+    };
     query?: never;
-    url: '/umbraco/umbracocommunityaiprovenance/api/v1/whatsMyName';
+    url: '/umbraco/umbracocommunityaiprovenance/api/v1/document/{id}/marks';
 };
 
-export type GetWhatsMyNameErrors = {
+export type PutDocumentByIdMarksErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
     /**
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * Forbidden
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: unknown;
 };
 
-export type GetWhatsMyNameResponses = {
+export type PutDocumentByIdMarksResponses = {
     /**
      * OK
      */
-    200: string;
+    200: unknown;
 };
-
-export type GetWhatsMyNameResponse = GetWhatsMyNameResponses[keyof GetWhatsMyNameResponses];
-
-export type GetWhatsTheTimeMrWolfData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/umbraco/umbracocommunityaiprovenance/api/v1/whatsTheTimeMrWolf';
-};
-
-export type GetWhatsTheTimeMrWolfErrors = {
-    /**
-     * The resource is protected and requires an authentication token
-     */
-    401: unknown;
-};
-
-export type GetWhatsTheTimeMrWolfResponses = {
-    /**
-     * OK
-     */
-    200: string;
-};
-
-export type GetWhatsTheTimeMrWolfResponse = GetWhatsTheTimeMrWolfResponses[keyof GetWhatsTheTimeMrWolfResponses];
-
-export type GetWhoAmIData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/umbraco/umbracocommunityaiprovenance/api/v1/whoAmI';
-};
-
-export type GetWhoAmIErrors = {
-    /**
-     * The resource is protected and requires an authentication token
-     */
-    401: unknown;
-};
-
-export type GetWhoAmIResponses = {
-    /**
-     * OK
-     */
-    200: WhoAmIResponseModel;
-};
-
-export type GetWhoAmIResponse = GetWhoAmIResponses[keyof GetWhoAmIResponses];
