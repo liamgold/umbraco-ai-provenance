@@ -64,15 +64,60 @@ public sealed class AiProvenanceReaderTests
         return content;
     }
 
-    private static AiProvenanceMark Mark(string alias, AiOrigin origin, string? culture = null, Guid? elementKey = null) => new()
+    /// <summary>A document with one property that varies by segment, and has its own value in the given segments only.</summary>
+    private static IPublishedContent SegmentContent(string alias, params string[] segmentsWithValues)
     {
-        Property = new AiPropertyReference(DocumentKey, alias, culture, null, elementKey),
+        var propertyType = new Mock<IPublishedPropertyType>();
+        propertyType.SetupGet(x => x.Variations).Returns(ContentVariation.Segment);
+        var property = new Mock<IPublishedProperty>();
+        property.SetupGet(x => x.Alias).Returns(alias);
+        property.SetupGet(x => x.PropertyType).Returns(propertyType.Object);
+        property.Setup(x => x.HasValue(It.IsAny<string?>(), It.IsAny<string?>()))
+            .Returns((string? _, string? segment) => segment is null || segmentsWithValues.Contains(segment));
+
+        var content = new Mock<IPublishedContent>();
+        content.SetupGet(x => x.Key).Returns(DocumentKey);
+        content.Setup(x => x.GetProperty(alias)).Returns(property.Object);
+        return content.Object;
+    }
+
+    private static AiProvenanceMark Mark(string alias, AiOrigin origin, string? culture = null, Guid? elementKey = null, string? segment = null) => new()
+    {
+        Property = new AiPropertyReference(DocumentKey, alias, culture, segment, elementKey),
         State = AiProvenanceState.Published,
         Origin = origin,
         Source = AiProvenanceSource.Manual,
         UpdatedBy = Guid.Empty,
         UpdatedUtc = DateTime.UtcNow,
     };
+
+    [Test]
+    public void A_segment_with_its_own_value_uses_its_own_mark()
+    {
+        _published.Add(Mark("headline", AiOrigin.AiModified));
+        _published.Add(Mark("headline", AiOrigin.AiGenerated, segment: "mobile"));
+        IPublishedContent content = SegmentContent("headline", "mobile");
+        AiProvenanceReader reader = CreateReader();
+
+        _variationContext = new VariationContext("en-US", "mobile");
+        Assert.That(reader.GetOrigin(content, "headline"), Is.EqualTo(AiOrigin.AiGenerated));
+
+        _variationContext = new VariationContext("en-US");
+        Assert.That(reader.GetOrigin(content, "headline"), Is.EqualTo(AiOrigin.AiModified), "No segment uses the default mark.");
+    }
+
+    [Test]
+    public void A_segment_without_its_own_value_uses_the_default_mark()
+    {
+        // Umbraco shows the default segment's value when a segment has no value of its own.
+        _published.Add(Mark("headline", AiOrigin.AiModified));
+        _published.Add(Mark("headline", AiOrigin.AiGenerated, segment: "mobile"));
+        IPublishedContent content = SegmentContent("headline", "mobile");
+
+        _variationContext = new VariationContext("en-US", "returning");
+
+        Assert.That(CreateReader().GetOrigin(content, "headline"), Is.EqualTo(AiOrigin.AiModified));
+    }
 
     [Test]
     public void Invariant_property_uses_the_invariant_mark()

@@ -73,12 +73,20 @@ internal sealed class AiProvenanceReader : IAiProvenanceReader
 
         // Only a property that varies by culture or segment has a culture or segment in its mark.
         VariationContext? variationContext = _variationContextAccessor.VariationContext;
+        string? requestedCulture = culture ?? variationContext?.Culture;
         string? markCulture = property.PropertyType.Variations.VariesByCulture()
-            ? AiPropertyReference.NormalizeCulture(culture ?? variationContext?.Culture)
+            ? AiPropertyReference.NormalizeCulture(requestedCulture)
             : null;
         string? markSegment = property.PropertyType.Variations.VariesBySegment()
             ? NullIfEmpty(segment ?? variationContext?.Segment)
             : null;
+
+        // A segment without its own value shows the default segment's value, so it gets the default segment's mark.
+        if (markSegment is not null
+            && property.HasValue(property.PropertyType.Variations.VariesByCulture() ? requestedCulture : null, markSegment) is false)
+        {
+            markSegment = null;
+        }
 
         return GetMarks(documentKey, preview)
             .FirstOrDefault(mark =>
