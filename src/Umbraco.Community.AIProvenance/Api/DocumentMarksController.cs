@@ -81,7 +81,8 @@ public sealed class DocumentMarksController : ControllerBase
     }
 
     /// <summary>
-    /// Sets or removes the draft mark of one property value. It needs the same permission as updating the document.
+    /// Sets or removes the draft mark of one property value. It needs the same permission as updating the document,
+    /// and, for a value in a culture, access to that culture's language.
     /// </summary>
     [HttpPut("{id:guid}/marks")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -90,7 +91,8 @@ public sealed class DocumentMarksController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> SetDocumentMark(Guid id, SetMarkRequestModel request)
     {
-        if (await IsAuthorizedAsync(ActionUpdate.ActionLetter, id) is false)
+        IEnumerable<string> cultures = string.IsNullOrWhiteSpace(request.Culture) ? [] : [request.Culture];
+        if (await IsAuthorizedAsync(ActionUpdate.ActionLetter, id, cultures) is false)
         {
             return StatusCode(StatusCodes.Status403Forbidden);
         }
@@ -108,11 +110,18 @@ public sealed class DocumentMarksController : ControllerBase
         return Ok();
     }
 
-    private async Task<bool> IsAuthorizedAsync(string permission, Guid documentKey)
+    /// <summary>
+    /// Checks the user's permission on the document. When cultures are given, Umbraco also checks that the user
+    /// has access to those languages.
+    /// </summary>
+    private async Task<bool> IsAuthorizedAsync(string permission, Guid documentKey, IEnumerable<string>? cultures = null)
     {
+        string[] cultureList = cultures?.ToArray() ?? [];
         AuthorizationResult result = await _authorizationService.AuthorizeResourceAsync(
             User,
-            ContentPermissionResource.WithKeys(permission, documentKey),
+            cultureList.Length > 0
+                ? ContentPermissionResource.WithKeys(permission, documentKey, cultureList)
+                : ContentPermissionResource.WithKeys(permission, documentKey),
             AuthorizationPolicies.ContentPermissionByResource);
         return result.Succeeded;
     }

@@ -26,4 +26,12 @@
     <None Update="appsettings.Tests.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
+  <!--
+    Umbraco's HTTP test server (WebApplicationFactory) starts from Umbraco's test assembly, which comes from NuGet
+    and has no deps.json in this output folder. This project's deps.json lists the same dependencies, so copy it.
+  -->
+  <Target Name="CopyDepsForUmbracoTestServer" AfterTargets="Build">
+    <Copy SourceFiles="$(OutDir)$(AssemblyName).deps.json" DestinationFiles="$(OutDir)Umbraco.Tests.Integration.deps.json" SkipUnchangedFiles="true" />
+  </Target>
+
 </Project>
