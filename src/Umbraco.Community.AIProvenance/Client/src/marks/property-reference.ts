@@ -2,6 +2,7 @@ import type { UmbControllerHost } from "@umbraco-cms/backoffice/controller-api";
 import type { UmbClassInterface } from "@umbraco-cms/backoffice/class-api";
 import { UMB_PROPERTY_CONTEXT, type UmbPropertyContext } from "@umbraco-cms/backoffice/property";
 import { UMB_WORKSPACE_CONTEXT } from "@umbraco-cms/backoffice/workspace";
+import { UMB_BLOCK_WORKSPACE_ALIAS } from "@umbraco-cms/backoffice/block";
 
 /** Identifies one property value of the open document. */
 export interface AipPropertyReference {
@@ -11,9 +12,6 @@ export interface AipPropertyReference {
   /** The block's element key, for a property inside a block. */
   elementKey: string | null;
 }
-
-/** The workspace that edits a block. Its unique is the block's element key. */
-const BLOCK_WORKSPACE_ALIAS = "Umb.Workspace.Block";
 
 /** The part of a workspace context that tells a document property from a block property. */
 export interface AipWorkspaceInfo {
@@ -33,7 +31,8 @@ export function referenceFromContexts(
   if (!propertyAlias) return undefined;
 
   const variantId = property.getVariantId();
-  const elementKey = workspace?.workspaceAlias === BLOCK_WORKSPACE_ALIAS ? (workspace.getUnique() ?? null) : null;
+  // The block workspace's unique is the block's element key.
+  const elementKey = workspace?.workspaceAlias === UMB_BLOCK_WORKSPACE_ALIAS ? (workspace.getUnique() ?? null) : null;
 
   return {
     propertyAlias,

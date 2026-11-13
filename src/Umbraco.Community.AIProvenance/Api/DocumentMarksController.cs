@@ -3,12 +3,15 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Attributes;
+using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Common.Filters;
 using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Cms.Web.Common.Filters;
 using Umbraco.Cms.Web.Common.Routing;
 using Umbraco.Community.AIProvenance.Api.Models;
 using Umbraco.Community.AIProvenance.Models;
@@ -27,21 +30,23 @@ namespace Umbraco.Community.AIProvenance.Api;
 [Authorize(Policy = AuthorizationPolicies.SectionAccessContent)]
 [MapToApi(Constants.ApiName)]
 [JsonOptionsName(Umbraco.Cms.Core.Constants.JsonOptionsNames.BackOffice)]
+[DisableBrowserCache]
+[Produces("application/json")]
 public sealed class DocumentMarksController : ControllerBase
 {
     private readonly IAiProvenanceService _provenanceService;
-    private readonly IContentService _contentService;
+    private readonly IEntityService _entityService;
     private readonly IAuthorizationService _authorizationService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
     public DocumentMarksController(
         IAiProvenanceService provenanceService,
-        IContentService contentService,
+        IEntityService entityService,
         IAuthorizationService authorizationService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
         _provenanceService = provenanceService;
-        _contentService = contentService;
+        _entityService = entityService;
         _authorizationService = authorizationService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
@@ -52,7 +57,7 @@ public sealed class DocumentMarksController : ControllerBase
     [HttpGet("{id:guid}/marks")]
     [ProducesResponseType<IEnumerable<MarkResponseModel>>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetDocumentMarks(Guid id)
     {
         if (await IsAuthorizedAsync(ActionBrowse.ActionLetter, id) is false)
@@ -60,9 +65,9 @@ public sealed class DocumentMarksController : ControllerBase
             return StatusCode(StatusCodes.Status403Forbidden);
         }
 
-        if (_contentService.GetById(id) is null)
+        if (DocumentExists(id) is false)
         {
-            return NotFound();
+            return DocumentNotFound();
         }
 
         IReadOnlyCollection<AiProvenanceMark> marks = await _provenanceService.GetMarksAsync(id, AiProvenanceState.Draft);
@@ -88,7 +93,7 @@ public sealed class DocumentMarksController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> SetDocumentMark(Guid id, SetMarkRequestModel request)
     {
         IEnumerable<string> cultures = string.IsNullOrWhiteSpace(request.Culture) ? [] : [request.Culture];
@@ -97,9 +102,9 @@ public sealed class DocumentMarksController : ControllerBase
             return StatusCode(StatusCodes.Status403Forbidden);
         }
 
-        if (_contentService.GetById(id) is null)
+        if (DocumentExists(id) is false)
         {
-            return NotFound();
+            return DocumentNotFound();
         }
 
         Guid userKey = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Key
@@ -109,6 +114,12 @@ public sealed class DocumentMarksController : ControllerBase
         await _provenanceService.SetMarkAsync(property, request.Origin, AiProvenanceSource.Manual, userKey);
         return Ok();
     }
+
+    private bool DocumentExists(Guid id) => _entityService.Exists(id, UmbracoObjectTypes.Document);
+
+    /// <summary>Returns a 404 with problem details, as the Management API does for a missing document.</summary>
+    private IActionResult DocumentNotFound() =>
+        NotFound(new ProblemDetailsBuilder().WithTitle("The document could not be found").Build());
 
     /// <summary>
     /// Checks the user's permission on the document. When cultures are given, Umbraco also checks that the user

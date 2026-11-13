@@ -11,7 +11,7 @@ namespace Umbraco.Community.AIProvenance.Notifications;
 /// <c>builder.AddNotificationAsyncHandler&lt;AiProvenanceMarkSavedNotification, MyHandler&gt;()</c>.
 /// It is published when the database transaction completes, so a handler never sees a change that was rolled back.
 /// </remarks>
-public sealed class AiProvenanceMarkSavedNotification : INotification
+public sealed class AiProvenanceMarkSavedNotification : StatefulNotification
 {
     public AiProvenanceMarkSavedNotification(AiProvenanceMark mark, AiOrigin previousOrigin)
     {

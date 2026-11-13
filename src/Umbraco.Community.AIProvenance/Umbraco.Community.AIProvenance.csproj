@@ -21,7 +21,6 @@
     <PackageReadmeFile>README_nuget.md</PackageReadmeFile>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageIcon></PackageIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -35,6 +34,12 @@
     <PackageReference Include="Umbraco.Cms.Api.Common" />
     <PackageReference Include="Umbraco.Cms.Api.Management" />
     <PackageReference Include="Umbraco.Cms.Api.Delivery" />
+    <!--
+      A direct reference, as in Umbraco's extension template. The composer uses Swashbuckle and OpenApi types.
+      Without this reference, NuGet can resolve a different Swashbuckle version from the site's, and the clashing
+      Microsoft.OpenApi versions stop the package's Swagger document appearing.
+    -->
+    <PackageReference Include="Swashbuckle.AspNetCore" />
   </ItemGroup>
 
   <ItemGroup>
