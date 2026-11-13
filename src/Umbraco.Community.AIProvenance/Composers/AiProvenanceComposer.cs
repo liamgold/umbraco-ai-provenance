@@ -1,10 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Umbraco.Cms.Core.Composing;
-using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Notifications;
-using Umbraco.Community.AIProvenance.DeliveryApi;
 using Umbraco.Community.AIProvenance.Notifications;
 using Umbraco.Community.AIProvenance.Persistence;
 using Umbraco.Community.AIProvenance.Rendering;
@@ -14,7 +12,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Community.AIProvenance.Composers;
 
 /// <summary>
-/// Registers the package's services, notification handlers and Delivery API output.
+/// Registers the package's services and notification handlers.
 /// </summary>
 public sealed class AiProvenanceComposer : IComposer
 {
@@ -27,8 +25,6 @@ public sealed class AiProvenanceComposer : IComposer
         builder.Services.AddSingleton<IAiProvenanceService, AiProvenanceService>();
         builder.Services.AddSingleton<IAiProvenanceReader, AiProvenanceReader>();
 
-        // Replaces Umbraco's builder to add the aiProvenance entry to each content item.
-        builder.Services.AddUnique<IApiContentResponseBuilder, AiProvenanceApiContentResponseBuilder>();
 
         builder
             .AddNotificationAsyncHandler<ContentPublishedNotification, ContentProvenanceNotificationHandler>()

@@ -141,22 +141,23 @@ The label shows "AI generated" or "AI modified", with a fuller explanation that 
 
 The package does not include the European Commission's AI icons. The Commission offers them for free use, but names no licence for them, and its legal notice excludes logos from its reuse policy. Sites can download the icons and add them to their own label view.
 
-The Content Delivery API adds the marked properties to each content item, as a reserved entry in `properties`:
+The Content Delivery API gets two endpoints for the marks, beside Umbraco's content endpoints: `content/item/{id}/ai-provenance` and `content/items/ai-provenance?id=...`. Each item in the response has its `id` and a `properties` object with the origin of each marked property:
 
 ```json
-"properties": {
-  "summary": "...",
-  "bodyText": "...",
-  "aiProvenance": {
+{
+  "id": "...",
+  "properties": {
     "summary": "aiGenerated",
     "bodyText": "aiModified"
   }
 }
 ```
 
-The entry sits inside `properties` because the Delivery API does not accept extra fields beside them. Only marked properties appear, in the request's culture. In preview, the output shows draft marks. Umbraco's extended webhooks use the same output, so their payloads include the entry too.
+Only marked properties appear, in the request's culture and segment. In preview, the endpoints return draft marks. They follow Umbraco's rules for API keys, start items, protected content and output caching.
 
-The setting `AIProvenance:DeliveryApiEnabled` turns this output off. Properties inside blocks are not included, because a block's output does not know which document contains it.
+The package does not change Umbraco's own content responses. An earlier version added an `aiProvenance` entry to them by replacing Umbraco's response builder. Only one replacement of that builder can be active, so the package could clash with a site's own replacement or another package's. The endpoints avoid that. The cost is a second request for a headless front end, and Umbraco's extended webhooks no longer include the marks.
+
+The setting `AIProvenance:DeliveryApiEnabled` turns the endpoints off. Properties inside blocks are not included, because the package has no way to show a block's marks beside the block in the Delivery API output.
 
 ## Umbraco versions
 

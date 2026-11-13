@@ -10,6 +10,7 @@
     <PackageVersion Include="Umbraco.Cms.Web.Common" Version="[17.8.1, 17.999.999)" />
     <PackageVersion Include="Umbraco.Cms.Api.Common" Version="[17.8.1, 17.999.999)" />
     <PackageVersion Include="Umbraco.Cms.Api.Management" Version="[17.8.1, 17.999.999)" />
+    <PackageVersion Include="Umbraco.Cms.Api.Delivery" Version="[17.8.1, 17.999.999)" />
     <!-- The Umbraco.AI add-on depends on the full Umbraco.AI package: Umbraco.AI.Core alone does not register its own services. -->
     <PackageVersion Include="Umbraco.AI" Version="[17.8.0, 17.999.999)" />
     <!-- The test site only, to run Umbraco.AI agents. -->

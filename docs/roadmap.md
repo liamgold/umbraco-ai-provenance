@@ -59,11 +59,11 @@ This roadmap lists the work for the first release, in order. Each phase ends wit
   - It renders "AI generated" or "AI modified", with a fuller explanation for screen readers and on hover or tap: "AI generated this content." or "Our editors wrote this content and edited it with AI."
   - It does not include the European Commission's AI icons, because their licence is unclear. Sites can add them in their own label view.
   - Sites can translate the text, and override the markup with a partial view such as `Views/Partials/AIProvenance/Label.cshtml`.
-- Add an `aiProvenance` entry to `properties` in the Content Delivery API output:
-  - Subclass `ApiContentResponseBuilder`, and do the same for `IApiContentBuilder` and `IApiElementBuilder`.
+- Add Content Delivery API endpoints that return a content item's marks:
+  - The first version added an `aiProvenance` entry to Umbraco's content responses. Endpoints replaced it, because only one package or site can replace Umbraco's response builder (see `design.md`).
   - List only the marked properties.
   - Read draft marks in preview.
-  - A setting turns the output off.
+  - A setting turns the endpoints off.
 
 **Acceptance:** a published, marked property shows its label through the tag helper, and appears in the Delivery API response. An unmarked property shows neither. Unit tests cover the extension method and the tag helper output.
 
