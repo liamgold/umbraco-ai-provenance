@@ -32,6 +32,9 @@ public abstract class AiProvenanceTestBase : UmbracoIntegrationTestWithContent
         builder.PackageMigrationPlans().Add<AiProvenanceMigrationPlan>();
     }
 
+    // appsettings.Tests.json turns off unattended package migrations. Otherwise Umbraco starts this plan on a
+    // background service at boot, it races this method to create the same table in the in-memory SQLite database,
+    // and the two connections lock each other until the test run times out.
     [SetUp]
     public async Task CreateTable() =>
         await GetRequiredService<PackageMigrationRunner>().RunPackagePlansAsync([Constants.PackageId]);

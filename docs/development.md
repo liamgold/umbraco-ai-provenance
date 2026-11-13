@@ -43,9 +43,18 @@ The test site has a project reference to the package. Running the site builds th
 
 Before the first run, give the test site its own image-signing key in .NET user secrets. Otherwise, Umbraco generates one and writes it into `appsettings.json`, which is committed:
 
+The key must be Base64. With Git Bash or another shell that has OpenSSL:
+
 ```sh
 cd src/Umbraco.Community.AIProvenance.TestSite
-dotnet user-secrets set "Umbraco:CMS:Imaging:HMACSecretKey" "<a long random string>"
+dotnet user-secrets set "Umbraco:CMS:Imaging:HMACSecretKey" "$(openssl rand -base64 64 | tr -d '\n')"
+```
+
+With PowerShell:
+
+```powershell
+cd src/Umbraco.Community.AIProvenance.TestSite
+dotnet user-secrets set "Umbraco:CMS:Imaging:HMACSecretKey" ([Convert]::ToBase64String([Security.Cryptography.RandomNumberGenerator]::GetBytes(64)))
 ```
 
 The test site uses [uSync](https://marketplace.umbraco.com/package/usync). It saves document types and other schema to disk, so test content types are in source control.
