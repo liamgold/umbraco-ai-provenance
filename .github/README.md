@@ -142,6 +142,23 @@ The mark records the AI provider and model. It works for agents in the Copilot c
 
 When an editor applies a prompt suggestion, Umbraco.AI changes the value in the browser and raises no event. The package cannot detect this, so editors mark these properties themselves. See [Proposed Umbraco.AI extension points](../docs/discovery.md#proposed-umbracoai-extension-points).
 
+## Notifications
+
+The package publishes two Umbraco notifications, so your code can react to marks, for example to log changes for an audit or alert a reviewer:
+
+| Notification | When | Contains |
+|---|---|---|
+| `AiProvenanceMarkSavedNotification` | A draft mark is set or changed, by an editor or by the Umbraco.AI add-on | `Mark` (the property, origin, source, provider, model and user) and `PreviousOrigin` |
+| `AiProvenanceMarkRemovedNotification` | A draft mark is removed | `Mark`, the removed mark |
+
+Register a handler in a composer, as for any Umbraco notification:
+
+```csharp
+builder.AddNotificationAsyncHandler<AiProvenanceMarkSavedNotification, MyMarkHandler>();
+```
+
+They are published when the database transaction completes, so a handler never sees a change that was rolled back. Publishing, unpublishing, copying and deleting documents do not publish them, because Umbraco already raises notifications for those operations.
+
 ## Configuration
 
 ```json

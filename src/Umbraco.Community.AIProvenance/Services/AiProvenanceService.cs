@@ -1,5 +1,6 @@
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Community.AIProvenance.Models;
+using Umbraco.Community.AIProvenance.Notifications;
 using Umbraco.Community.AIProvenance.Persistence;
 
 namespace Umbraco.Community.AIProvenance.Services;
@@ -52,11 +53,12 @@ internal sealed class AiProvenanceService : IAiProvenanceService
         property = property.Normalize();
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
-        _repository.Delete(_repository.GetForDocument(property.DocumentKey)
+        AiProvenanceDto[] existing = _repository.GetForDocument(property.DocumentKey)
             .Where(x => x.State == (byte)AiProvenanceState.Draft && Matches(x, property))
-            .Select(x => x.Id));
+            .ToArray();
+        _repository.Delete(existing.Select(x => x.Id));
 
-        _repository.Insert([new AiProvenanceDto
+        var row = new AiProvenanceDto
         {
             DocumentKey = property.DocumentKey,
             ElementKey = property.ElementKey,
@@ -70,7 +72,12 @@ internal sealed class AiProvenanceService : IAiProvenanceService
             AiModel = aiModel,
             UpdatedBy = userKey,
             UpdatedUtc = _timeProvider.GetUtcNow().UtcDateTime,
-        }]);
+        };
+        _repository.Insert([row]);
+
+        // The scope publishes the notification when it completes, so handlers never see a rolled-back change.
+        AiOrigin previousOrigin = existing.Length > 0 ? (AiOrigin)existing[0].Origin : AiOrigin.None;
+        scope.Notifications.Publish(new AiProvenanceMarkSavedNotification(ToMark(row), previousOrigin));
 
         scope.Complete();
         return Task.CompletedTask;
@@ -81,9 +88,15 @@ internal sealed class AiProvenanceService : IAiProvenanceService
         property = property.Normalize();
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
-        _repository.Delete(_repository.GetForDocument(property.DocumentKey)
+        AiProvenanceDto[] existing = _repository.GetForDocument(property.DocumentKey)
             .Where(x => x.State == (byte)AiProvenanceState.Draft && Matches(x, property))
-            .Select(x => x.Id));
+            .ToArray();
+        _repository.Delete(existing.Select(x => x.Id));
+
+        if (existing.Length > 0)
+        {
+            scope.Notifications.Publish(new AiProvenanceMarkRemovedNotification(ToMark(existing[0])));
+        }
 
         scope.Complete();
         return Task.CompletedTask;

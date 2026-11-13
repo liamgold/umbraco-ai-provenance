@@ -77,7 +77,7 @@ public sealed class ContentNotificationTests : AiProvenanceTestBase
 
         ContentType variantType = ContentTypeBuilder.CreateBasicContentType("variantPage", "Variant Page");
         variantType.Variations = ContentVariation.Culture;
-        ContentTypeService.Save(variantType);
+        await ContentTypeService.CreateAsync(variantType, UserKey);
 
         Content page = ContentBuilder.CreateBasicContent(variantType);
         page.SetCultureName("Page", "en-US");
