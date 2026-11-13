@@ -161,4 +161,60 @@ public sealed class DocumentMarksPermissionTests : PackageApiTestBase
         await AssertStatusAsync(await PutMarkAsync("en-US"), HttpStatusCode.OK);
         await AssertStatusAsync(await PutMarkAsync("da-DK"), HttpStatusCode.Forbidden);
     }
+
+    [Test]
+    public async Task A_missing_document_returns_not_found_with_problem_details()
+    {
+        await SignInAsGroupAsync(Umbraco.Cms.Core.Constants.Security.AdminGroupKey);
+
+        HttpResponseMessage response = await Client.GetAsync(MarksUrl(Guid.NewGuid()));
+
+        await AssertStatusAsync(response, HttpStatusCode.NotFound);
+        var problem = await response.Content.ReadFromJsonAsync<Microsoft.AspNetCore.Mvc.ProblemDetails>();
+        Assert.That(problem?.Title, Is.EqualTo("The document could not be found"));
+    }
+
+    [TestCase("culture", 51)]
+    [TestCase("segment", 256)]
+    public async Task Values_longer_than_their_column_are_rejected(string field, int length)
+    {
+        await SignInAsGroupAsync(Umbraco.Cms.Core.Constants.Security.AdminGroupKey);
+        var value = new string('x', length);
+
+        HttpResponseMessage response = await Client.PutAsJsonAsync(MarksUrl(_document.Key), new
+        {
+            propertyAlias = "title",
+            culture = field == "culture" ? value : null,
+            segment = field == "segment" ? value : null,
+            origin = "AiGenerated",
+        });
+
+        await AssertStatusAsync(response, HttpStatusCode.BadRequest);
+    }
+
+    [Test]
+    public async Task An_unknown_origin_is_rejected()
+    {
+        await SignInAsGroupAsync(Umbraco.Cms.Core.Constants.Security.AdminGroupKey);
+
+        HttpResponseMessage response = await Client.PutAsJsonAsync(MarksUrl(_document.Key), new
+        {
+            propertyAlias = "title",
+            culture = "en-US",
+            origin = 7,
+        });
+
+        await AssertStatusAsync(response, HttpStatusCode.BadRequest);
+    }
+
+    [Test]
+    public async Task Responses_are_not_cached_by_the_browser()
+    {
+        await SignInAsGroupAsync(Umbraco.Cms.Core.Constants.Security.AdminGroupKey);
+
+        HttpResponseMessage response = await GetMarksAsync();
+
+        await AssertStatusAsync(response, HttpStatusCode.OK);
+        Assert.That(response.Headers.CacheControl?.NoStore, Is.True);
+    }
 }

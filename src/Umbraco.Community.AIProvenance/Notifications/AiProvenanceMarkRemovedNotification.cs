@@ -11,7 +11,7 @@ namespace Umbraco.Community.AIProvenance.Notifications;
 /// copying or deleting a document changes marks, because those follow content operations that Umbraco already
 /// raises notifications for.
 /// </remarks>
-public sealed class AiProvenanceMarkRemovedNotification : INotification
+public sealed class AiProvenanceMarkRemovedNotification : StatefulNotification
 {
     public AiProvenanceMarkRemovedNotification(AiProvenanceMark mark) => Mark = mark;
 
