@@ -1,18 +1,13 @@
-using System.Linq.Expressions;
 using System.Net;
 using System.Net.Http.Json;
-using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
-using Umbraco.Cms.Api.Management.Controllers.Document;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Infrastructure.Install;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
-using Umbraco.Cms.Tests.Integration.ManagementApi;
 using Umbraco.Community.AIProvenance.Models;
 using Umbraco.Community.AIProvenance.Services;
 
@@ -21,11 +16,7 @@ namespace Umbraco.Community.AIProvenance.Tests.Api;
 /// <summary>
 /// Calls the document marks endpoints over HTTP as users with different permissions.
 /// </summary>
-/// <remarks>
-/// <see cref="ManagementApiTest{T}"/> provides the test server and signs users in. Its controller type only
-/// matters for URL helpers, which these tests do not use: they call the package's routes directly.
-/// </remarks>
-public sealed class DocumentMarksPermissionTests : ManagementApiTest<ByKeyDocumentController>
+public sealed class DocumentMarksPermissionTests : PackageApiTestBase
 {
     private IContentService ContentService => GetRequiredService<IContentService>();
 
@@ -40,21 +31,11 @@ public sealed class DocumentMarksPermissionTests : ManagementApiTest<ByKeyDocume
     private IContent _document = null!;
     private IContent _otherRoot = null!;
 
-    protected override Expression<Func<ByKeyDocumentController, object>> MethodSelector { get; set; } =
-        x => x.ByKey(CancellationToken.None, Guid.Empty);
-
-    // MVC finds controllers in the app's entry assembly and its references. The test server's entry assembly is
-    // Umbraco's test assembly, which does not reference the package, so add the package's controllers.
-    protected override void CustomMvcSetup(IMvcBuilder mvcBuilder) =>
-        mvcBuilder.AddApplicationPart(typeof(Umbraco.Community.AIProvenance.Api.DocumentMarksController).Assembly);
-
-    private string MarksUrl(Guid documentKey) => $"/umbraco/umbracocommunityaiprovenance/api/v1/document/{documentKey}/marks";
+    private static string MarksUrl(Guid documentKey) => $"{ApiRoot}/document/{documentKey}/marks";
 
     [SetUp]
     public async Task CreateContent()
     {
-        await GetRequiredService<PackageMigrationRunner>().RunPackagePlansAsync([Constants.PackageId]);
-
         await LanguageService.CreateAsync(new LanguageBuilder().WithCultureInfo("da-DK").Build(), Umbraco.Cms.Core.Constants.Security.SuperUserKey);
 
         ContentType contentType = ContentTypeBuilder.CreateBasicContentType(Guid.NewGuid().ToString("N"), "Variant Page");

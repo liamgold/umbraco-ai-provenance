@@ -2,7 +2,7 @@
 
 import type { Client, ClientMeta, Options as Options2, RequestResult, TDataShape } from './client';
 import { client } from './client.gen';
-import type { GetDocumentByIdMarksData, GetDocumentByIdMarksErrors, GetDocumentByIdMarksResponses, PutDocumentByIdMarksData, PutDocumentByIdMarksErrors, PutDocumentByIdMarksResponses } from './types.gen';
+import type { GetConfigurationData, GetConfigurationErrors, GetConfigurationResponses, GetDocumentByIdMarksData, GetDocumentByIdMarksErrors, GetDocumentByIdMarksResponses, PutDocumentByIdMarksData, PutDocumentByIdMarksErrors, PutDocumentByIdMarksResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -17,6 +17,12 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
      */
     meta?: keyof ClientMeta extends never ? Record<string, unknown> : ClientMeta;
 };
+
+export const getConfiguration = <ThrowOnError extends boolean = true>(options?: Options<GetConfigurationData, ThrowOnError>): RequestResult<GetConfigurationResponses, GetConfigurationErrors, ThrowOnError> => (options?.client ?? client).get<GetConfigurationResponses, GetConfigurationErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/umbraco/umbracocommunityaiprovenance/api/v1/configuration',
+    ...options
+});
 
 export const getDocumentByIdMarks = <ThrowOnError extends boolean = true>(options: Options<GetDocumentByIdMarksData, ThrowOnError>): RequestResult<GetDocumentByIdMarksResponses, GetDocumentByIdMarksErrors, ThrowOnError> => (options.client ?? client).get<GetDocumentByIdMarksResponses, GetDocumentByIdMarksErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
