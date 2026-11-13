@@ -1,0 +1,14 @@
+{
+    "$schema": "https://marketplace.umbraco.com/umbraco-marketplace-schema.json", 
+    "AuthorDetails": {
+      "Name": "Liam Goldfinch",
+      "ImageUrl": "https://github.com/liamgold.png"
+    },
+    "Category": "",
+    "Description": "",
+    "LicenseTypes": [ "Free" ],
+    "IssueTrackerUrl": "https://github.com/liamgold/umbraco-ai-provenance/issues",
+    "PackageType": "Package",
+    "Tags": [],
+    "Title": "AI Provenance"
+  }
