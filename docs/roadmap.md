@@ -69,7 +69,7 @@ This roadmap lists the work for the first release, in order. Each phase ends wit
 
 ## Phase 4: automatic marking with Umbraco.AI
 
-- Add the project `src/Umbraco.Community.AIProvenance.UmbracoAI`, packed as its own NuGet package. It references `Umbraco.AI.Core` 17.x and needs Umbraco 17.5 or later. Nothing else in the solution references Umbraco.AI.
+- Add the project `src/Umbraco.Community.AIProvenance.UmbracoAI`, packed as its own NuGet package. It references `Umbraco.AI.Core` 17.8 or later. Nothing else in the solution references Umbraco.AI.
 - Add a `ContentSavingNotification` handler. When `IAIRuntimeContextAccessor.Context` is not null:
   - compare the old and new value of each property
   - mark each changed property with the rules in [`design.md`](design.md#automatic-marking-covers-agent-writes), with source `UmbracoAI`

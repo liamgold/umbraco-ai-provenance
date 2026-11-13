@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Umbraco.Community.AIProvenance\Umbraco.Community.AIProvenance.csproj" />
+    <ProjectReference Include="..\..\src\Umbraco.Community.AIProvenance.UmbracoAI\Umbraco.Community.AIProvenance.UmbracoAI.csproj" />
   </ItemGroup>
 
   <ItemGroup>

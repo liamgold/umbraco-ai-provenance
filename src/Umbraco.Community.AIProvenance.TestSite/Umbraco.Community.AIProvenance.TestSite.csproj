@@ -12,6 +12,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- Umbraco.AI, to test automatic marking of agent writes. -->
+    <PackageReference Include="Umbraco.AI" />
+    <PackageReference Include="Umbraco.AI.Agent" />
+    <PackageReference Include="Umbraco.AI.Agent.Copilot" />
+    <PackageReference Include="Umbraco.AI.MicrosoftFoundry" />
+  </ItemGroup>
+
+  <ItemGroup>
     <!-- Opt-in to app-local ICU to ensure consistent globalization APIs across different platforms -->
     <PackageReference Include="Microsoft.ICU.ICU4C.Runtime" />
     <PackageReference Include="uSync" />
@@ -20,6 +28,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Community.AIProvenance\Umbraco.Community.AIProvenance.csproj" />
+    <ProjectReference Include="..\Umbraco.Community.AIProvenance.UmbracoAI\Umbraco.Community.AIProvenance.UmbracoAI.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

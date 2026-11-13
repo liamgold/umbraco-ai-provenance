@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Product>Umbraco.Community.AIProvenance.UmbracoAI</Product>
+    <PackageId>Umbraco.Community.AIProvenance.UmbracoAI</PackageId>
+    <Title>AI Provenance for Umbraco.AI</Title>
+    <Description>Marks content as AI generated or AI modified automatically when Umbraco.AI agents change it. An add-on for Umbraco.Community.AIProvenance.</Description>
+    <PackageTags>umbraco</PackageTags>
+    <Authors>Liam Goldfinch</Authors>
+    <Copyright>$([System.DateTime]::UtcNow.ToString(`yyyy`)) © Liam Goldfinch</Copyright>
+    <PackageProjectUrl>https://github.com/liamgold/umbraco-ai-provenance</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/liamgold/umbraco-ai-provenance</RepositoryUrl>
+    <PackageReadmeFile>README_nuget.md</PackageReadmeFile>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Umbraco.AI.Core" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Umbraco.Community.AIProvenance\Umbraco.Community.AIProvenance.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Umbraco.Community.AIProvenance.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\docs\README_nuget.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+</Project>

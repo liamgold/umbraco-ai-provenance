@@ -76,7 +76,7 @@ The test site uses [uSync](https://marketplace.umbraco.com/package/usync). It sa
 ## Umbraco versions and branches
 
 - `main` targets **Umbraco 17**, the current Long Term Support (LTS) version.
-- The package's Umbraco dependency is `[17.0.0, 18.0.0)`. NuGet then refuses to install it on Umbraco 18 or later.
+- The package's Umbraco dependency is `[17.6.0, 18.0.0)`. NuGet then refuses to install it on Umbraco 18 or later.
 - The test site runs the latest Umbraco 17 release.
 
 Umbraco 18 changed how the Management API generates its OpenAPI documents. A build for 17 with Management API endpoints does not run on 18. When work on 18 support starts:

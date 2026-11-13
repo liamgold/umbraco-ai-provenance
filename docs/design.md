@@ -76,6 +76,8 @@ Umbraco.AI agents, including Automate workflows, change content on the server. T
 
 An `AiGenerated` mark never changes to `AiModified` automatically.
 
+The add-on compares whole property values. When an agent changes a property inside a block, the add-on marks the block property as a whole, not the property inside the block.
+
 When an editor applies a prompt suggestion, Umbraco.AI changes the value in the browser and fires no event. The package cannot detect this in a supported way, so editors mark these properties themselves. The extension point that would fix this is in [`discovery.md`](discovery.md#proposed-umbracoai-extension-points), as a proposal for Umbraco.AI.
 
 ### Marks follow the content
@@ -86,8 +88,8 @@ Rolling back a document does not restore its marks. Umbraco's rollback notificat
 
 ### Umbraco.AI integration is a separate package
 
-- **`Umbraco.Community.AIProvenance`** has the marking, the backoffice, the Razor helpers and the Delivery API output. It does not reference Umbraco.AI, and it supports Umbraco 17.0 and later.
-- **`Umbraco.Community.AIProvenance.UmbracoAI`** adds automatic marking. It references `Umbraco.AI.Core`, which needs Umbraco 17.5 or later.
+- **`Umbraco.Community.AIProvenance`** has the marking, the backoffice, the Razor helpers and the Delivery API output. It does not reference Umbraco.AI, and it supports Umbraco 17.6 and later. Umbraco 17.6 added the published cultures to the publish notification, which keeps marks correct per language.
+- **`Umbraco.Community.AIProvenance.UmbracoAI`** adds automatic marking. It references `Umbraco.AI.Core` 17.8 or later, and needs the same Umbraco version as the main package.
 
 Sites without Umbraco.AI install only the first package. Changes in Umbraco.AI only affect the add-on. The add-on can also move into Umbraco.AI itself later.
 
@@ -158,7 +160,7 @@ The setting `AIProvenance:DeliveryApiEnabled` turns this output off. Properties 
 
 ## Umbraco versions
 
-The first release targets Umbraco 17, the current Long Term Support (LTS) version. The main package supports 17.0 and later. The Umbraco.AI add-on supports 17.5 and later, because Umbraco.AI needs 17.5. Both NuGet dependencies stop below Umbraco 18, so NuGet does not install them on sites that they do not support.
+The first release targets Umbraco 17, the current Long Term Support (LTS) version. Both packages support Umbraco 17.6 and later. The add-on also needs Umbraco.AI 17.8 or later. Both NuGet dependencies stop below Umbraco 18, so NuGet does not install them on sites that they do not support.
 
 Umbraco 18 changed how the Management API generates its OpenAPI documents. Packages with their own Management API endpoints need a separate build for 18 and later. Support for 18 and later comes after the 17 release, as a separate major version of the package.
 
