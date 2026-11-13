@@ -23,7 +23,6 @@ public sealed class TestSegmentsComposer : IComposer
         builder.Services.Configure<SegmentSettings>(settings =>
         {
             settings.Enabled = true;
-            settings.AllowCreation = false;
         });
         builder.Services.AddUnique<ISegmentService, TestSegmentService>();
     }

@@ -60,7 +60,7 @@ public sealed class DocumentMarksPermissionTests : ManagementApiTest<ByKeyDocume
         ContentType contentType = ContentTypeBuilder.CreateBasicContentType(Guid.NewGuid().ToString("N"), "Variant Page");
         contentType.Variations = ContentVariation.Culture;
         contentType.AllowedAsRoot = true;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Umbraco.Cms.Core.Constants.Security.SuperUserKey);
 
         _document = CreateDocument(contentType);
         _otherRoot = CreateDocument(contentType);
