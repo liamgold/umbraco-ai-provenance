@@ -4,6 +4,8 @@
 [![NuGet](https://img.shields.io/nuget/vpre/Umbraco.Community.AIProvenance?color=0273B3)](https://www.nuget.org/packages/Umbraco.Community.AIProvenance)
 [![GitHub license](https://img.shields.io/github/license/liamgold/umbraco-ai-provenance?color=8AB803)](https://github.com/liamgold/umbraco-ai-provenance/blob/main/LICENSE)
 
+![AI Provenance for Umbraco: editors mark properties in the backoffice, Umbraco.AI agents' changes are marked automatically, and readers see an AI label](https://raw.githubusercontent.com/liamgold/umbraco-ai-provenance/main/docs/screenshots/hero.png)
+
 Records where AI was involved in your Umbraco content, one property at a time.
 
 - Editors mark any property as **AI generated** or **AI modified** from its action menu, per culture and inside blocks. The document's Info view lists the marks.

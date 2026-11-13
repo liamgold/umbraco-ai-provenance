@@ -6,7 +6,7 @@
 
 AI Provenance records where AI was involved in your Umbraco content, one property at a time. Editors mark properties as **AI generated** or **AI modified**. With Umbraco.AI, agents' changes are marked automatically. Your website and the Content Delivery API can then show an AI label next to marked content.
 
-<img alt="AI labels on a website: a heading marked AI modified, and a summary and body text marked AI generated" src="https://raw.githubusercontent.com/liamgold/umbraco-ai-provenance/main/docs/screenshots/website-labels.png" width="600">
+![AI Provenance for Umbraco: editors mark properties in the backoffice, Umbraco.AI agents' changes are marked automatically, and readers see an AI label](https://raw.githubusercontent.com/liamgold/umbraco-ai-provenance/main/docs/screenshots/hero.png)
 
 ## What it does
 
@@ -42,15 +42,17 @@ Restart the site after you install. The package creates its database table on st
 
 Open a property's action menu (the **…** next to its label) and choose **Mark as AI generated** or **Mark as AI modified**. The menu then shows the property's mark, and lets you change it or remove it.
 
-<img alt="The property action menu for a Title property marked AI modified, offering to change it to AI generated or remove the mark" src="https://raw.githubusercontent.com/liamgold/umbraco-ai-provenance/main/docs/screenshots/property-actions.png" width="700">
+![The property action menu for a Title property marked AI modified, offering to change it to AI generated or remove the mark](https://raw.githubusercontent.com/liamgold/umbraco-ai-provenance/main/docs/screenshots/property-actions.png)
 
 The document's **Info** view lists every marked property.
 
-<img alt="The AI provenance box in the Info view, listing Body text and Summary as AI generated and Title as AI modified" src="https://raw.githubusercontent.com/liamgold/umbraco-ai-provenance/main/docs/screenshots/info-view.png" width="420">
+![The AI provenance box in the Info view, listing Body text and Summary as AI generated and Title as AI modified](https://raw.githubusercontent.com/liamgold/umbraco-ai-provenance/main/docs/screenshots/info-view.png)
 
 The actions appear on text, rich text, Markdown, tags, code, block, media, upload and link properties.
 
 ## Show AI labels on your website
+
+![AI labels on a website: a heading marked AI modified, and a summary and body text marked AI generated](https://raw.githubusercontent.com/liamgold/umbraco-ai-provenance/main/docs/screenshots/website-labels.png)
 
 Register the tag helper in `Views/_ViewImports.cshtml`:
 
