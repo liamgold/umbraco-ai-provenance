@@ -8,6 +8,10 @@ export type AiOrigin = 'None' | 'AiGenerated' | 'AiModified';
 
 export type AiProvenanceSource = 'Manual' | 'UmbracoAI';
 
+export type ConfigurationResponseModel = {
+    additionalPropertyEditorUis: Array<string>;
+};
+
 export type MarkResponseModel = {
     propertyAlias: string;
     culture?: string | null;
@@ -27,6 +31,29 @@ export type SetMarkRequestModel = {
     elementKey?: string | null;
     origin: AiOrigin;
 };
+
+export type GetConfigurationData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/umbraco/umbracocommunityaiprovenance/api/v1/configuration';
+};
+
+export type GetConfigurationErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+};
+
+export type GetConfigurationResponses = {
+    /**
+     * OK
+     */
+    200: ConfigurationResponseModel;
+};
+
+export type GetConfigurationResponse = GetConfigurationResponses[keyof GetConfigurationResponses];
 
 export type GetDocumentByIdMarksData = {
     body?: never;

@@ -48,7 +48,7 @@ The document's **Info** view lists every marked property.
 
 ![The AI provenance box in the Info view, listing Body text and Summary as AI generated and Title as AI modified](https://raw.githubusercontent.com/liamgold/umbraco-ai-provenance/main/docs/screenshots/info-view.png)
 
-The actions appear on text, rich text, Markdown, tags, code, block, media, upload and link properties.
+The actions appear on text, rich text, Markdown, tags, code, block, media, upload and link properties. To add them to other property editors, such as a third-party editor, list the editors' UI aliases in the `AIProvenance:AdditionalPropertyEditorUis` setting (see [Configuration](#configuration)).
 
 ## Show AI labels on your website
 
@@ -165,6 +165,7 @@ They are published when the database transaction completes, so a handler never s
 {
   "AIProvenance": {
     "DeliveryApiEnabled": true,
+    "AdditionalPropertyEditorUis": [ "My.PropertyEditorUi.Headline" ],
     "UmbracoAI": {
       "AutomaticMarking": true
     }
@@ -175,6 +176,7 @@ They are published when the database transaction completes, so a handler never s
 | Setting | Default | Effect |
 |---|---|---|
 | `AIProvenance:DeliveryApiEnabled` | `true` | Adds the `aiProvenance` entry to Delivery API output |
+| `AIProvenance:AdditionalPropertyEditorUis` | `[]` | Property editor UI aliases that also get the mark actions, on top of Umbraco's own content editors |
 | `AIProvenance:UmbracoAI:AutomaticMarking` | `true` | Marks properties that Umbraco.AI agents change (add-on only) |
 
 ## Known limitations
@@ -183,7 +185,6 @@ They are published when the database transaction completes, so a handler never s
 - **Editor-applied prompt suggestions** are not marked automatically (see above).
 - **Copying a document** copies its marks, except marks on properties inside blocks, because Umbraco gives copied blocks new keys.
 - **Automatic marking inside blocks** marks the block property as a whole.
-- **Third-party property editors** do not show the mark actions. The package lists Umbraco's own content editors.
 - **Media** is not covered.
 
 ## How it works

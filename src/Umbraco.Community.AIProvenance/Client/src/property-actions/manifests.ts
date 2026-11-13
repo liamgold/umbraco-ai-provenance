@@ -42,21 +42,23 @@ const actions: Array<AipActionDefinition> = [
   { alias: "RemoveModified", label: "#aiProvenance_removeModified", icon: "icon-delete", origin: "None", showWhen: ["AiModified"] },
 ];
 
-export const manifests: Array<UmbExtensionManifest> = [
-  {
-    type: "condition",
-    name: "AI Provenance Mark State Condition",
-    alias: AIP_MARK_STATE_CONDITION_ALIAS,
-    api: () => import("./mark-state.condition.js"),
-  },
-  ...actions.map(
+/**
+ * Creates the mark actions for a list of property editor UIs.
+ * @param propertyEditorUis The property editor UI aliases that show the actions.
+ * @param aliasSuffix Added to each action's alias, so a second set of actions does not clash with the first.
+ */
+export function createMarkActionManifests(
+  propertyEditorUis: Array<string>,
+  aliasSuffix = "",
+): Array<UmbExtensionManifest> {
+  return actions.map(
     (action, index): UmbExtensionManifest => ({
       type: "propertyAction",
       kind: "default",
-      alias: `AiProvenance.PropertyAction.${action.alias}`,
-      name: `AI Provenance: ${action.alias}`,
+      alias: `AiProvenance.PropertyAction.${action.alias}${aliasSuffix}`,
+      name: `AI Provenance: ${action.alias}${aliasSuffix}`,
       api: () => import("./set-mark.property-action.js"),
-      forPropertyEditorUis: AIP_SUPPORTED_PROPERTY_EDITOR_UIS,
+      forPropertyEditorUis: propertyEditorUis,
       weight: 50 - index,
       separatorBefore: index === 0 || index === 2,
       meta: {
@@ -66,5 +68,15 @@ export const manifests: Array<UmbExtensionManifest> = [
       },
       conditions: [{ alias: AIP_MARK_STATE_CONDITION_ALIAS, oneOf: action.showWhen }],
     }),
-  ),
+  );
+}
+
+export const manifests: Array<UmbExtensionManifest> = [
+  {
+    type: "condition",
+    name: "AI Provenance Mark State Condition",
+    alias: AIP_MARK_STATE_CONDITION_ALIAS,
+    api: () => import("./mark-state.condition.js"),
+  },
+  ...createMarkActionManifests(AIP_SUPPORTED_PROPERTY_EDITOR_UIS),
 ];

@@ -4,15 +4,12 @@ import type {
 } from "@umbraco-cms/backoffice/extension-api";
 import { UMB_AUTH_CONTEXT } from "@umbraco-cms/backoffice/auth";
 import { client } from "../api/client.gen.js";
+import { getConfiguration } from "../api/index.js";
+import { AIP_SUPPORTED_PROPERTY_EDITOR_UIS, createMarkActionManifests } from "../property-actions/manifests.js";
 
-// load up the manifests here
-export const onInit: UmbEntryPointOnInit = async (host, _extensionRegistry) => {
-  // Wire the generated API client into the backoffice auth context.
-  // configureClient() sets baseUrl + credentials, attaches the auth callback
-  // (cookie-based, with automatic token refresh) and binds the default
-  // response interceptors (401 retry, error notifications, etc.).
-  // The framework awaits onInit, so resolving the context here ensures the
-  // client is fully configured before any element in this extension can use it.
+export const onInit: UmbEntryPointOnInit = async (host, extensionRegistry) => {
+  // Wire the generated API client into the backoffice auth context, so its requests are authenticated.
+  // The framework awaits onInit, so the client is configured before any element in this extension uses it.
   const authContext = await host.getContext(UMB_AUTH_CONTEXT);
   if (!authContext) {
     console.warn("UMB_AUTH_CONTEXT not available — extension API client will not be authenticated");
@@ -20,7 +17,28 @@ export const onInit: UmbEntryPointOnInit = async (host, _extensionRegistry) => {
   }
   authContext.configureClient(client);
 
+  await registerAdditionalPropertyEditors(extensionRegistry);
 };
 
-export const onUnload: UmbEntryPointOnUnload = (_host, _extensionRegistry) => {
-};
+/**
+ * Adds the mark actions to the property editors in the AIProvenance:AdditionalPropertyEditorUis setting.
+ * The built-in editors keep their actions even when this request fails.
+ */
+async function registerAdditionalPropertyEditors(
+  extensionRegistry: Parameters<UmbEntryPointOnInit>[1],
+): Promise<void> {
+  try {
+    const { data } = await getConfiguration({ throwOnError: false });
+    const additional = (data?.additionalPropertyEditorUis ?? []).filter(
+      (alias) => !AIP_SUPPORTED_PROPERTY_EDITOR_UIS.includes(alias),
+    );
+
+    if (additional.length > 0) {
+      extensionRegistry.registerMany(createMarkActionManifests(additional, ".Additional"));
+    }
+  } catch (error) {
+    console.warn("AI Provenance could not load its settings, so only the built-in property editors show the mark actions.", error);
+  }
+}
+
+export const onUnload: UmbEntryPointOnUnload = () => {};
