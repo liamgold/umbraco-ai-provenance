@@ -76,5 +76,5 @@ To keep the version-specific code small, keep the Management API code in one fol
 
 - **Write all code from scratch.** The package follows the documented behaviour of the products in [Prior art](design.md#prior-art). It does not copy their code, samples or API names.
 - **Check before you rely on an API.** Confirm Umbraco and Umbraco.AI APIs in their source, their docs or the running test site.
-- **Keep Umbraco.AI code in its adapter.** Only the Umbraco.AI adapter references Umbraco.AI. See [`design.md`](design.md#umbracoai-is-optional).
+- **Keep Umbraco.AI code in the add-on.** Only `Umbraco.Community.AIProvenance.UmbracoAI` references Umbraco.AI. See [`design.md`](design.md#umbracoai-integration-is-a-separate-package).
 - **Discuss design changes first.** A change to a decision in [`design.md`](design.md) needs an issue or a discussion before the pull request.

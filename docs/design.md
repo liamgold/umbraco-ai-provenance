@@ -13,15 +13,15 @@ Umbraco.AI logs AI activity, such as which prompts ran and when. It does not sto
 ## What it does
 
 1. Editors mark any property on a document as **AI generated** or **AI modified**, or remove the mark.
-2. When an editor applies an Umbraco.AI suggestion to a property, the package marks the property automatically.
-3. Editors see which properties carry a mark.
+2. When an Umbraco.AI agent changes a property, an optional add-on package marks the property automatically.
+3. Editors see which properties carry a mark, in each property's action menu and in the document's Info view.
 4. Developers read the marks in Razor and in the Content Delivery API output.
 5. A tag helper renders an accessible AI label on the website. Sites opt in field by field.
 6. It works on any document type, with no changes to the document type.
 
 ## What it does not do
 
-- **It does not detect AI.** The package records what editors mark and what Umbraco.AI applies. Text pasted in from another AI tool stays unmarked until an editor marks it. An unmarked property does not prove that a person wrote it.
+- **It does not detect AI.** The package records what editors mark and what Umbraco.AI agents write. Text pasted in from another AI tool stays unmarked until an editor marks it. An unmarked property does not prove that a person wrote it.
 - **It does not watermark content.** It does not embed C2PA Content Credentials or other machine-readable marks in the content itself.
 - **It does not make a site compliant** with the EU AI Act or any other law. It provides information that can help with compliance.
 - **It does not cover media.** For images, use [AI Image Disclosure](https://github.com/thebuilder/umbraco-ai-image-disclosure) (see [Prior art](#prior-art)).
@@ -48,6 +48,17 @@ The alternative was a hidden property added through a composition. That approach
 
 A variant document can carry different marks in each language. Invariant properties use no culture.
 
+A property inside a Block List or Block Grid item has its own mark. The package identifies it by the block's element key and the property's alias.
+
+### Editors see marks in two places
+
+Umbraco 17 has no supported extension point for a badge next to a property's label. The package uses two supported places instead:
+
+- Each property's action menu shows the current mark, with the actions to change or remove it.
+- The document's Info view lists every marked property.
+
+If Umbraco adds a way to extend the property label, a badge can follow.
+
 ### Draft and published marks are separate
 
 Editing a property's mark changes the draft. Publishing copies the draft marks to the published state. The website and the Delivery API read the published state. A mark therefore appears on the site at the same time as the content it describes.
@@ -56,26 +67,33 @@ Editing a property's mark changes the draft. Publishing copies the draft marks t
 
 When an editor rewrites an AI-generated field, the mark stays. The editor removes the mark or changes it to AI modified. The package cannot tell how much of the AI text survived an edit, so a guess would often be wrong.
 
-### Automatic marking follows two rules
+### Automatic marking covers agent writes
 
-- An Umbraco.AI suggestion applied to an **empty** property marks it `AiGenerated`.
-- An Umbraco.AI suggestion applied to a property **with content** marks it `AiModified`.
+Umbraco.AI agents, including Automate workflows, change content on the server. The add-on package detects these saves and marks each changed property:
+
+- A change to an **empty** property marks it `AiGenerated`.
+- A change to a property **with content** marks it `AiModified`.
 
 An `AiGenerated` mark never changes to `AiModified` automatically.
 
+When an editor applies a prompt suggestion, Umbraco.AI changes the value in the browser and fires no event. The package cannot detect this in a supported way, so editors mark these properties themselves. The extension point that would fix this is in [`discovery.md`](discovery.md#proposed-umbracoai-extension-points), as a proposal for Umbraco.AI.
+
 ### Marks follow the content
 
-Copying a document copies its marks. Deleting a document deletes its marks. Rolling back a document restores its marks, if Umbraco's version history allows it. Otherwise, the README lists rollback as a known limitation.
+Copying a document copies its marks. Deleting a document deletes its marks.
 
-### Umbraco.AI is optional
+Rolling back a document does not restore its marks. Umbraco's rollback notification does not say which version the editor chose. After a rollback, the draft keeps its current marks, and the editor adjusts them.
 
-All the code that knows about Umbraco.AI sits in one adapter, with its own composer. Without Umbraco.AI, the package still works with manual marking.
+### Umbraco.AI integration is a separate package
 
-This keeps the package stable when Umbraco.AI changes. It also means the adapter can move to a separate package later, or into Umbraco.AI itself, without changes to the rest of the package.
+- **`Umbraco.Community.AIProvenance`** has the marking, the backoffice, the Razor helpers and the Delivery API output. It does not reference Umbraco.AI, and it supports Umbraco 17.0 and later.
+- **`Umbraco.Community.AIProvenance.UmbracoAI`** adds automatic marking. It references `Umbraco.AI.Core`, which needs Umbraco 17.5 or later.
+
+Sites without Umbraco.AI install only the first package. Changes in Umbraco.AI only affect the add-on. The add-on can also move into Umbraco.AI itself later.
 
 ### Automatic marks record the model
 
-When the package marks a property automatically, it also stores the AI provider and model that Umbraco.AI used. The first version does not display this information. It is stored now because the package cannot recover it later for content that is already marked.
+When the add-on marks a property, it also stores the AI provider and model that Umbraco.AI used. The first version does not display this information. It is stored now because the package cannot recover it later for content that is already marked.
 
 ## Data model
 
@@ -85,7 +103,8 @@ The table `aiProvenance` holds one row per marked property:
 |---|---|---|
 | `id` | int, identity | Primary key |
 | `documentKey` | Guid | The document's key |
-| `propertyAlias` | nvarchar(255) | |
+| `elementKey` | Guid, null | The block's element key, for a property inside a block. Null otherwise |
+| `propertyAlias` | nvarchar(255) | The property's alias. Inside a block, the alias of the property in the block |
 | `culture` | nvarchar(50), null | Null for invariant properties |
 | `segment` | nvarchar(255), null | Null when the property has no segment |
 | `state` | tinyint | 0 = draft, 1 = published |
@@ -96,7 +115,7 @@ The table `aiProvenance` holds one row per marked property:
 | `updatedBy` | Guid | The user's key |
 | `updatedUtc` | datetime | |
 
-A unique index covers `documentKey`, `propertyAlias`, `culture`, `segment` and `state`. To remove a mark, the package deletes the row.
+A unique index covers `documentKey`, `elementKey`, `propertyAlias`, `culture`, `segment` and `state`. To remove a mark, the package deletes the row.
 
 ## For developers
 
@@ -116,20 +135,24 @@ A tag helper renders a label when the property carries a mark, and nothing when 
 
 The label shows "AI generated" or "AI modified", with a fuller explanation for screen readers and on hover or tap. Sites can translate the text and override the markup with a partial view.
 
-The Content Delivery API adds the marked properties to each content item:
+The Content Delivery API adds the marked properties to each content item, as a reserved entry in `properties`:
 
 ```json
-"aiProvenance": {
-  "summary": "aiGenerated",
-  "bodyText": "aiModified"
+"properties": {
+  "summary": "...",
+  "bodyText": "...",
+  "aiProvenance": {
+    "summary": "aiGenerated",
+    "bodyText": "aiModified"
+  }
 }
 ```
 
-Only marked properties appear. A setting turns this output off.
+The entry sits inside `properties` because the Delivery API does not accept extra fields beside them. Only marked properties appear. In preview, the output shows draft marks. A setting turns this output off.
 
 ## Umbraco versions
 
-The first release targets Umbraco 17, the current Long Term Support (LTS) version. Its NuGet dependency stops below Umbraco 18, so NuGet does not install it on sites that it does not support.
+The first release targets Umbraco 17, the current Long Term Support (LTS) version. The main package supports 17.0 and later. The Umbraco.AI add-on supports 17.5 and later, because Umbraco.AI needs 17.5. Both NuGet dependencies stop below Umbraco 18, so NuGet does not install them on sites that they do not support.
 
 Umbraco 18 changed how the Management API generates its OpenAPI documents. Packages with their own Management API endpoints need a separate build for 18 and later. Support for 18 and later comes after the 17 release, as a separate major version of the package.
 
@@ -153,5 +176,7 @@ These are not planned for the first release:
 - A bulk action to mark several items at once
 - Webhooks or notifications when a mark changes
 - schema.org JSON-LD output, so crawlers can read the marks
-- Mark history for every content version, not only draft and published
+- Mark history for every content version, so a rollback restores the marks
+- Automatic marking of editor-applied suggestions, once Umbraco.AI offers a hook for it
+- A badge next to the property label, once Umbraco offers a way to extend it
 - A proposal to move the feature, or the extension point it needs, into Umbraco.AI
