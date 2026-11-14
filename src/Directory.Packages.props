@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <PackageVersion Include="Umbraco.Cms" Version="[17.8.1, 17.999.999)" />
+    <PackageVersion Include="Umbraco.Cms.Core" Version="[17.8.1, 17.999.999)" />
     <PackageVersion Include="Umbraco.Cms.Web.Website" Version="[17.8.1, 17.999.999)" />
     <PackageVersion Include="Umbraco.Cms.Web.Common" Version="[17.8.1, 17.999.999)" />
     <PackageVersion Include="Umbraco.Cms.Api.Common" Version="[17.8.1, 17.999.999)" />
