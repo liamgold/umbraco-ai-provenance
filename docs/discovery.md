@@ -17,7 +17,7 @@ Checked on 13 Nov 2026.
 | 3. Agent writes | Server-side, with a detectable AI context that includes the provider and model | Automatic marking of agent writes is workable |
 | 4. Backoffice | Property actions work. No supported place for a badge by the label | The indicator needs an alternative |
 | 5. Notifications | All present. Publish reports cultures, but not segments | No change |
-| 6. Delivery API | Extend the content response builder, inside `properties` | The output sits inside `properties` |
+| 6. Delivery API | Extending the content response builder works, but only one replacement can be active. A package controller can reuse Umbraco's content controller base | The marks have their own endpoints |
 | 7. Management API | Standard package pattern, with the document update permission check | No change |
 | 8. Rollback | The rollback notification does not say which version | Rollback needs version snapshots, or stays a known gap |
 
@@ -116,8 +116,13 @@ No notification carries segments. On publish, the package copies all segment mar
 
 - `IApiContentResponseBuilder` is a singleton. Its default implementation, `ApiContentResponseBuilder`, has a virtual `Create` method ([`ApiContentResponseBuilder.cs#L29`](https://github.com/umbraco/Umbraco-CMS/blob/release-17.8.1/src/Umbraco.Core/DeliveryApi/ApiContentResponseBuilder.cs#L29)).
 - A new response type would fail serialization. The JSON type resolver only accepts `ApiContentResponse` ([`ContentJsonTypeResolverBase.cs#L49-L77`](https://github.com/umbraco/Umbraco-CMS/blob/release-17.8.1/src/Umbraco.Infrastructure/Serialization/ContentJsonTypeResolverBase.cs#L49-L77)).
-- **Approach:** subclass `ApiContentResponseBuilder`, override `Create`, and add an `aiProvenance` entry to `properties`. Do the same for `IApiContentBuilder` (linked items) and `IApiElementBuilder` (blocks).
+- **First approach:** subclass `ApiContentResponseBuilder`, override `Create`, and add an `aiProvenance` entry to `properties`. It worked, but the builder is registered once. A package that replaces it clashes with any other replacement, so the package moved to its own endpoints.
+- Umbraco's content controllers get their behaviour from attributes on `ContentApiControllerBase` ([`ContentApiControllerBase.cs#L15-L22`](https://github.com/umbraco/Umbraco-CMS/blob/release-17.8.1/src/Umbraco.Cms.Api.Delivery/Controllers/Content/ContentApiControllerBase.cs#L15-L22)): the API key check, the `Accept-Language`, `Accept-Segment` and `Preview` headers, the start item, the `Vary` header and the output cache.
+- Two of those attributes are internal: `ContextualizeFromAcceptHeadersAttribute` ([`#L9`](https://github.com/umbraco/Umbraco-CMS/blob/release-17.8.1/src/Umbraco.Cms.Api.Delivery/Filters/ContextualizeFromAcceptHeadersAttribute.cs#L9)) and `ValidateStartItemAttribute` ([`#L8`](https://github.com/umbraco/Umbraco-CMS/blob/release-17.8.1/src/Umbraco.Cms.Api.Delivery/Filters/ValidateStartItemAttribute.cs#L8)). A package can't apply them itself.
+- `ContentApiItemControllerBase` is public and abstract ([`ContentApiItemControllerBase.cs#L8`](https://github.com/umbraco/Umbraco-CMS/blob/release-17.8.1/src/Umbraco.Cms.Api.Delivery/Controllers/Content/ContentApiItemControllerBase.cs#L8)). A package controller that inherits it gets all the attributes, the member access check and `SetOutputCacheContent`. Route attributes add up rather than replace, so the controller's routes sit under `content`.
+- **Approach:** the package's `AiProvenanceDeliveryApiController` inherits `ContentApiItemControllerBase`, with `item/{id}/ai-provenance` and `items/ai-provenance`. Tested on the test site: cultures, segments, several ids, a missing id, the `Vary` header, and the routes in Umbraco's Delivery API Swagger document.
 - In preview, the Delivery API serves draft content, so the package reads draft marks there.
+- **Tests:** the integration test server swaps the server messenger for one that ignores cache refreshes ([`UmbracoBuilderExtensions.cs#L63`](https://github.com/umbraco/Umbraco-CMS/blob/release-17.8.1/tests/Umbraco.Tests.Integration/DependencyInjection/UmbracoBuilderExtensions.cs#L63)), and leaves out the `ContentTreeChangeNotification` cache handler. Published content then never reaches the Delivery API. The tests register the handler and a local messenger, as Umbraco's own Delivery API tests do.
 
 ## 7. Management API
 
@@ -168,4 +173,4 @@ These findings changed [`design.md`](design.md) on 13 Nov 2026:
 | Marking agent writes needs `Umbraco.AI.Core` and Umbraco 17.5 (sections 1 and 3) | Put the Umbraco.AI integration in a separate add-on package. The main package stays on 17.0 |
 | Rollback does not say which version (section 8) | Rollback does not restore marks. The README lists it as a limitation |
 | A block property needs its element key (section 4) | Add `elementKey` to the data model |
-| The Delivery API rejects extra fields beside `properties` (section 6) | Put `aiProvenance` inside `properties` |
+| The Delivery API rejects extra fields beside `properties`, and only one package can replace its response builder (section 6) | Serve the marks from separate endpoints |

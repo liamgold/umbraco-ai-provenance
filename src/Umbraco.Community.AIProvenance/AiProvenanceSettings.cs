@@ -8,7 +8,7 @@ public sealed class AiProvenanceSettings
     /// <summary>The name of the configuration section.</summary>
     public const string SectionName = "AIProvenance";
 
-    /// <summary>Whether the Delivery API output includes the <c>aiProvenance</c> entry. On by default.</summary>
+    /// <summary>Whether the Delivery API endpoints for the marks are on. On by default. When off, they return 404.</summary>
     public bool DeliveryApiEnabled { get; set; } = true;
 
     /// <summary>

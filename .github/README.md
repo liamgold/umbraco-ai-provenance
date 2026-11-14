@@ -14,7 +14,7 @@ AI Provenance records where AI was involved in your Umbraco content, one propert
 - Editors see the marks in each property's action menu and in the document's Info view.
 - Publishing copies the marks to the published content, so the website shows them when it shows the content.
 - Razor views read the marks with `GetAiOrigin()`, and the `<ai-label>` tag helper renders an accessible label.
-- The Content Delivery API includes the marks in each content item.
+- Headless sites read the marks from the Content Delivery API.
 - An optional add-on marks properties automatically when an Umbraco.AI agent changes them, and records the AI provider and model.
 
 ## What it does not do
@@ -115,20 +115,31 @@ The website reads the published marks. Preview reads the draft marks.
 
 ## Content Delivery API
 
-Each content item gets an `aiProvenance` entry in its `properties`, with the marked properties in the request's culture:
+The package adds two endpoints beside Umbraco's content endpoints. They return the marked properties of published content:
+
+| Endpoint | Returns |
+|---|---|
+| `GET /umbraco/delivery/api/v2/content/item/{id}/ai-provenance` | One content item's marks |
+| `GET /umbraco/delivery/api/v2/content/items/ai-provenance?id={id}&id={id}` | Several items' marks. Ids that match no published item are left out |
 
 ```json
-"properties": {
-  "title": "Hello from an AI agent",
-  "summary": "An AI generated summary.",
-  "aiProvenance": {
+{
+  "id": "7633a476-b155-426c-a8bc-de5bd6c66efa",
+  "properties": {
     "title": "aiModified",
     "summary": "aiGenerated"
   }
 }
 ```
 
-The entry is inside `properties`, because the Delivery API does not accept extra fields beside them. Umbraco's extended webhooks include it too. Properties inside blocks are not included.
+Only marked properties appear. The endpoints work like Umbraco's own content endpoints:
+
+- They use the `Accept-Language` and `Accept-Segment` headers to choose the culture and segment.
+- With the `Preview` header and an API key, they return draft marks.
+- They need the API key when the Delivery API is not public, and they check member access to protected content.
+- They share the Delivery API output cache, and publishing clears it.
+
+Umbraco's own content responses don't change. Properties inside blocks are not included.
 
 ## Automatic marking with Umbraco.AI
 
@@ -175,7 +186,7 @@ They are published when the database transaction completes, so a handler never s
 
 | Setting | Default | Effect |
 |---|---|---|
-| `AIProvenance:DeliveryApiEnabled` | `true` | Adds the `aiProvenance` entry to Delivery API output |
+| `AIProvenance:DeliveryApiEnabled` | `true` | Turns on the Delivery API endpoints. When it is `false`, they return 404 |
 | `AIProvenance:AdditionalPropertyEditorUis` | `[]` | Property editor UI aliases that also get the mark actions, on top of Umbraco's own content editors |
 | `AIProvenance:UmbracoAI:AutomaticMarking` | `true` | Marks properties that Umbraco.AI agents change (add-on only) |
 

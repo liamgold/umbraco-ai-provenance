@@ -359,3 +359,6 @@ src/.idea
 .DS_Store
 # The backoffice extension is built from Client/ (npm run build). CI builds it before packing.
 src/Umbraco.Community.AIProvenance/wwwroot/App_Plugins/UmbracoCommunityAIProvenance/
+
+# Examine indexes that integration tests write when they publish content
+tests/Umbraco.Community.AIProvenance.Tests/umbraco/
