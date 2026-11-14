@@ -198,6 +198,7 @@ They are published when the database transaction completes, so a handler never s
 - **Editor-applied prompt suggestions** are not marked automatically (see above).
 - **Copying a document** copies its marks, except marks on properties inside blocks, because Umbraco gives copied blocks new keys.
 - **Automatic marking inside blocks** marks the block property as a whole.
+- **Moving content between environments** with uSync does not move its marks, because uSync exports the content but not the package's table. Umbraco Deploy has not been tested and most likely has the same gap. Mark content on each environment, or follow [#28](https://github.com/liamgold/umbraco-ai-provenance/issues/28) for a fix.
 - **Media** is not covered.
 
 ## How it works
