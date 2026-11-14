@@ -27,7 +27,7 @@ public abstract class DeliveryApiTestBase : PackageApiTestBase
 
     private static readonly Guid SuperUserKey = Umbraco.Cms.Core.Constants.Security.SuperUserKey;
 
-    private IContentService ContentService => GetRequiredService<IContentService>();
+    protected IContentService ContentService => GetRequiredService<IContentService>();
 
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
@@ -146,6 +146,25 @@ public sealed class DeliveryApiEndpointTests : DeliveryApiTestBase
         HttpResponseMessage response = await GetItemAsync(Guid.NewGuid());
 
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
+    }
+
+    [Test]
+    public async Task Treats_an_unpublished_culture_as_not_found_like_umbraco_does()
+    {
+        ContentService.Unpublish(Page, "da-DK");
+
+        HttpResponseMessage danish = await GetItemAsync(Page.Key, "da-DK");
+        HttpResponseMessage english = await GetItemAsync(Page.Key, "en-US");
+        var itemsRequest = new HttpRequestMessage(HttpMethod.Get, $"{ContentRoot}/items/ai-provenance?id={Page.Key}");
+        itemsRequest.Headers.Add("Accept-Language", "da-DK");
+        AiProvenanceResponseModel[] danishItems = await ReadAsync<AiProvenanceResponseModel[]>(await Client.SendAsync(itemsRequest));
+
+        Assert.Multiple(async () =>
+        {
+            Assert.That(danish.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
+            Assert.That(english.StatusCode, Is.EqualTo(HttpStatusCode.OK), await english.Content.ReadAsStringAsync());
+            Assert.That(danishItems, Is.Empty);
+        });
     }
 
     [Test]
