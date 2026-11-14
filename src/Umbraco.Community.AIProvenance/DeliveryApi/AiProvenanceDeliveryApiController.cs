@@ -27,6 +27,8 @@ public sealed class AiProvenanceDeliveryApiController : ContentApiItemController
     private readonly IRequestPreviewService _requestPreviewService;
     private readonly IAiProvenanceReader _reader;
     private readonly IOptionsMonitor<AiProvenanceSettings> _settings;
+    private readonly IApiContentRouteBuilder _apiContentRouteBuilder;
+    private readonly IVariationContextAccessor _variationContextAccessor;
 
     public AiProvenanceDeliveryApiController(
         IApiPublishedContentCache apiPublishedContentCache,
@@ -34,13 +36,17 @@ public sealed class AiProvenanceDeliveryApiController : ContentApiItemController
         IRequestMemberAccessService requestMemberAccessService,
         IRequestPreviewService requestPreviewService,
         IAiProvenanceReader reader,
-        IOptionsMonitor<AiProvenanceSettings> settings)
+        IOptionsMonitor<AiProvenanceSettings> settings,
+        IApiContentRouteBuilder apiContentRouteBuilder,
+        IVariationContextAccessor variationContextAccessor)
         : base(apiPublishedContentCache, apiContentResponseBuilder)
     {
         _requestMemberAccessService = requestMemberAccessService;
         _requestPreviewService = requestPreviewService;
         _reader = reader;
         _settings = settings;
+        _apiContentRouteBuilder = apiContentRouteBuilder;
+        _variationContextAccessor = variationContextAccessor;
     }
 
     /// <summary>
@@ -61,7 +67,7 @@ public sealed class AiProvenanceDeliveryApiController : ContentApiItemController
         }
 
         IPublishedContent? content = await ApiPublishedContentCache.GetByIdAsync(id).ConfigureAwait(false);
-        if (content is null)
+        if (content is null || IsAvailable(content) is false)
         {
             return NotFound();
         }
@@ -78,7 +84,7 @@ public sealed class AiProvenanceDeliveryApiController : ContentApiItemController
 
     /// <summary>
     /// Gets the marked properties of several content items, in the request's culture and segment.
-    /// Keys that match no published item are left out.
+    /// Keys that match no item published in that culture are left out.
     /// </summary>
     /// <param name="ids">The content items' keys.</param>
     [HttpGet("items/ai-provenance")]
@@ -103,8 +109,15 @@ public sealed class AiProvenanceDeliveryApiController : ContentApiItemController
         }
 
         SetOutputCacheContent(contentItems);
-        return Ok(contentItems.Select(CreateResponse).ToArray());
+        return Ok(contentItems.Where(IsAvailable).Select(CreateResponse).ToArray());
     }
+
+    /// <summary>
+    /// Whether the content is available in the request's culture. Umbraco's own content endpoints leave out content
+    /// they can't build a route for, such as a culture that isn't published, so these endpoints do the same.
+    /// </summary>
+    private bool IsAvailable(IPublishedContent content) =>
+        _apiContentRouteBuilder.Build(content, _variationContextAccessor.VariationContext?.Culture) is not null;
 
     private AiProvenanceResponseModel CreateResponse(IPublishedContent content)
     {

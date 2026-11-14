@@ -121,8 +121,8 @@ The package adds two endpoints beside Umbraco's content endpoints. They return t
 
 | Endpoint | Returns |
 |---|---|
-| `GET /umbraco/delivery/api/v2/content/item/{id}/ai-provenance` | One content item's marks |
-| `GET /umbraco/delivery/api/v2/content/items/ai-provenance?id={id}&id={id}` | Several items' marks. Ids that match no published item are left out |
+| `GET /umbraco/delivery/api/v2/content/item/{id}/ai-provenance` | One content item's marks, or 404 when the item isn't published in the requested culture |
+| `GET /umbraco/delivery/api/v2/content/items/ai-provenance?id={id}&id={id}` | Several items' marks. Ids that match no item published in the requested culture are left out |
 
 ```json
 {
