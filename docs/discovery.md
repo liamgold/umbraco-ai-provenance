@@ -112,6 +112,14 @@ All in `src/Umbraco.Core/Notifications/`.
 
 No notification carries segments. On publish, the package copies all segment marks for each published culture.
 
+Publishing a branch raises one `ContentPublishedNotification` for the whole branch ([`ContentService.cs#L2056`](https://github.com/umbraco/Umbraco-CMS/blob/release-17.8.1/src/Umbraco.Core/Services/ContentService.cs#L2056)), so the package publishes the branch's marks in one batch. Deleting raises one `ContentDeletedNotification` per document ([`ContentService.cs#L2712`](https://github.com/umbraco/Umbraco-CMS/blob/release-17.8.1/src/Umbraco.Core/Services/ContentService.cs#L2712)), so deletes stay per document. The timing tests in `tests/.../Performance` measure both. With 1,001 documents on SQL Server LocalDB, the package adds no measurable time to a branch publish, and about 0.6 seconds to deleting the branch.
+
+### Caching published marks
+
+- `ContentCacheRefresherNotification` runs on every server after content changes, including the server that made the change. Its payloads are `ContentCacheRefresher.JsonPayload` items with the document's `Key` and `ChangeTypes` ([`ContentCacheRefresher.cs#L564-L589`](https://github.com/umbraco/Umbraco-CMS/blob/release-17.8.1/src/Umbraco.Core/Cache/Refreshers/Implement/ContentCacheRefresher.cs#L564-L589)). `Key` can be null, and `RefreshBranch` or `RefreshAll` covers more than one document.
+- **Approach:** cache each document's published marks in an isolated runtime cache. The refresher handler clears one document, or everything for a branch, a full refresh or a missing key. The publish, unpublish, copy and delete handler clears the document again after it changes the marks, because the two notifications can run in either order. Entries expire after five minutes as a safety net.
+- **Tests:** integration tests run with `AppCaches.NoCache` ([`UmbracoBuilderExtensions.cs#L47`](https://github.com/umbraco/Umbraco-CMS/blob/release-17.8.1/tests/Umbraco.Tests.Integration/DependencyInjection/UmbracoBuilderExtensions.cs#L47)), so the cache tests register real caches.
+
 ## 6. Content Delivery API
 
 - `IApiContentResponseBuilder` is a singleton. Its default implementation, `ApiContentResponseBuilder`, has a virtual `Create` method ([`ApiContentResponseBuilder.cs#L29`](https://github.com/umbraco/Umbraco-CMS/blob/release-17.8.1/src/Umbraco.Core/DeliveryApi/ApiContentResponseBuilder.cs#L29)).
