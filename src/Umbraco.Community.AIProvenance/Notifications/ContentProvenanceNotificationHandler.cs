@@ -1,6 +1,7 @@
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Community.AIProvenance.Caching;
 using Umbraco.Community.AIProvenance.Services;
 using Umbraco.Extensions;
 
@@ -16,8 +17,13 @@ internal sealed class ContentProvenanceNotificationHandler :
     INotificationAsyncHandler<ContentDeletedNotification>
 {
     private readonly IAiProvenanceService _service;
+    private readonly PublishedMarksCache _publishedMarksCache;
 
-    public ContentProvenanceNotificationHandler(IAiProvenanceService service) => _service = service;
+    public ContentProvenanceNotificationHandler(IAiProvenanceService service, PublishedMarksCache publishedMarksCache)
+    {
+        _service = service;
+        _publishedMarksCache = publishedMarksCache;
+    }
 
     public async Task HandleAsync(ContentPublishedNotification notification, CancellationToken cancellationToken)
     {
@@ -31,6 +37,9 @@ internal sealed class ContentProvenanceNotificationHandler :
             {
                 await _service.UnpublishAsync(content.Key, unpublished);
             }
+
+            // Umbraco may refresh its content cache before this handler runs, so clear the marks again now.
+            _publishedMarksCache.Clear(content.Key);
         }
     }
 
@@ -40,17 +49,22 @@ internal sealed class ContentProvenanceNotificationHandler :
         foreach (IContent content in notification.UnpublishedEntities)
         {
             await _service.UnpublishAsync(content.Key, cultures: null);
+            _publishedMarksCache.Clear(content.Key);
         }
     }
 
-    public Task HandleAsync(ContentCopiedNotification notification, CancellationToken cancellationToken) =>
-        _service.CopyAsync(notification.Original.Key, notification.Copy.Key);
+    public async Task HandleAsync(ContentCopiedNotification notification, CancellationToken cancellationToken)
+    {
+        await _service.CopyAsync(notification.Original.Key, notification.Copy.Key);
+        _publishedMarksCache.Clear(notification.Copy.Key);
+    }
 
     public async Task HandleAsync(ContentDeletedNotification notification, CancellationToken cancellationToken)
     {
         foreach (IContent content in notification.DeletedEntities)
         {
             await _service.DeleteAllAsync(content.Key);
+            _publishedMarksCache.Clear(content.Key);
         }
     }
 

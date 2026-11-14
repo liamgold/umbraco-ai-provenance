@@ -84,6 +84,8 @@ When an editor applies a prompt suggestion, Umbraco.AI changes the value in the 
 
 Copying a document copies its marks. Deleting a document deletes its marks.
 
+The website caches each document's published marks across requests, so a listing page does not read the database once per document. Publishing, unpublishing, copying and deleting a document clear its cached marks on every server.
+
 Rolling back a document does not restore its marks. Umbraco's rollback notification does not say which version the editor chose. After a rollback, the draft keeps its current marks, and the editor adjusts them.
 
 ### Umbraco.AI integration is a separate package
