@@ -1,0 +1,49 @@
+<!doctype html>
+<!--
+  Source of the package icon. To regenerate icon.png, open this page in a browser at 512 by 512 pixels and
+  screenshot the #icon element. The colours match docs/screenshots/hero.html.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>AI Provenance icon</title>
+<style>
+  html, body { margin: 0; padding: 0; background: transparent; }
+  #icon { width: 512px; height: 512px; display: block; }
+</style>
+</head>
+<body>
+<svg id="icon" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="AI Provenance">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#283a97"/>
+      <stop offset="1" stop-color="#1b264f"/>
+    </linearGradient>
+    <linearGradient id="badge" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#5b6ae0"/>
+      <stop offset="1" stop-color="#3544b1"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background tile -->
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+
+  <!-- Document, with a folded corner -->
+  <path d="M132 96h168l80 80v232a24 24 0 0 1-24 24H132a24 24 0 0 1-24-24V120a24 24 0 0 1 24-24z" fill="#fff"/>
+  <path d="M300 96v56a24 24 0 0 0 24 24h56z" fill="#dfe3ff"/>
+
+  <!-- Lines of content. The highlighted line is the marked property. -->
+  <rect x="148" y="208" width="128" height="22" rx="11" fill="#c9cde6"/>
+  <rect x="140" y="254" width="208" height="48" rx="14" fill="#e3e6ff"/>
+  <rect x="158" y="268" width="172" height="20" rx="10" fill="#3544b1"/>
+  <rect x="148" y="326" width="192" height="22" rx="11" fill="#c9cde6"/>
+  <rect x="148" y="372" width="148" height="22" rx="11" fill="#c9cde6"/>
+
+  <!-- Sparkle badge -->
+  <circle cx="378" cy="138" r="86" fill="#1b264f"/>
+  <circle cx="378" cy="138" r="72" fill="url(#badge)"/>
+  <path d="M378 82l13 37 37 13-37 13-13 37-13-37-37-13 37-13z" fill="#fff"/>
+  <path d="M418 160l5.5 15.5 15.5 5.5-15.5 5.5-5.5 15.5-5.5-15.5-15.5-5.5 15.5-5.5z" fill="#fff"/>
+</svg>
+</body>
+</html>
