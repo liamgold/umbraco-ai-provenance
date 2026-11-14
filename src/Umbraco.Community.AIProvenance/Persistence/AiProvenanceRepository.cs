@@ -10,6 +10,11 @@ namespace Umbraco.Community.AIProvenance.Persistence;
 /// </summary>
 internal sealed class AiProvenanceRepository
 {
+    /// <summary>
+    /// The most values in one <c>IN</c> list. SQL Server allows 2,100 parameters in a command.
+    /// </summary>
+    private const int MaxParameters = 1000;
+
     private readonly IScopeAccessor _scopeAccessor;
 
     public AiProvenanceRepository(IScopeAccessor scopeAccessor) => _scopeAccessor = scopeAccessor;
@@ -31,6 +36,23 @@ internal sealed class AiProvenanceRepository
         return Database.Fetch<AiProvenanceDto>(sql);
     }
 
+    /// <summary>
+    /// Gets the rows of several documents, for example every document in a published branch.
+    /// </summary>
+    public List<AiProvenanceDto> GetForDocuments(IEnumerable<Guid> documentKeys)
+    {
+        var rows = new List<AiProvenanceDto>();
+        foreach (Guid[] chunk in documentKeys.Distinct().Chunk(MaxParameters))
+        {
+            rows.AddRange(Database.Fetch<AiProvenanceDto>(Database.SqlContext.Sql()
+                .SelectAll()
+                .From<AiProvenanceDto>()
+                .WhereIn<AiProvenanceDto>(x => x.DocumentKey, chunk)));
+        }
+
+        return rows;
+    }
+
     public void Insert(IEnumerable<AiProvenanceDto> rows)
     {
         foreach (AiProvenanceDto row in rows)
@@ -42,15 +64,12 @@ internal sealed class AiProvenanceRepository
 
     public void Delete(IEnumerable<int> ids)
     {
-        int[] idArray = ids.ToArray();
-        if (idArray.Length == 0)
+        foreach (int[] chunk in ids.Chunk(MaxParameters))
         {
-            return;
+            Database.Execute(Database.SqlContext.Sql()
+                .Delete<AiProvenanceDto>()
+                .WhereIn<AiProvenanceDto>(x => x.Id, chunk));
         }
-
-        Database.Execute(Database.SqlContext.Sql()
-            .Delete<AiProvenanceDto>()
-            .WhereIn<AiProvenanceDto>(x => x.Id, idArray));
     }
 
     public void DeleteForDocument(Guid documentKey) =>

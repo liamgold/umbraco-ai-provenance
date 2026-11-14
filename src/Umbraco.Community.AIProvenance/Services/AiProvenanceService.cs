@@ -102,21 +102,63 @@ internal sealed class AiProvenanceService : IAiProvenanceService
         return Task.CompletedTask;
     }
 
-    public Task PublishAsync(Guid documentKey, IEnumerable<string>? cultures)
+    public Task PublishAsync(Guid documentKey, IEnumerable<string>? cultures) =>
+        PublishManyAsync([new DocumentPublication(documentKey, cultures)]);
+
+    /// <summary>
+    /// Copies the draft marks of several documents to their published state in one transaction, for example
+    /// when a branch is published. It reads all the documents' marks in one query.
+    /// </summary>
+    internal Task PublishManyAsync(IReadOnlyCollection<DocumentPublication> documents)
     {
-        Func<string?, bool> inScope = CultureFilter(cultures);
+        if (documents.Count == 0)
+        {
+            return Task.CompletedTask;
+        }
+
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
-        List<AiProvenanceDto> rows = _repository.GetForDocument(documentKey);
+        // Most documents have no marks, so the query returns few rows even for a large branch.
+        ILookup<Guid, AiProvenanceDto> rowsByDocument = _repository
+            .GetForDocuments(documents.Select(x => x.DocumentKey))
+            .ToLookup(x => x.DocumentKey);
 
-        // Invariant values (a null culture) are published with every culture.
-        _repository.Delete(rows
-            .Where(x => x.State == (byte)AiProvenanceState.Published && (x.Culture is null || inScope(x.Culture)))
-            .Select(x => x.Id));
+        var deletes = new List<int>();
+        var inserts = new List<AiProvenanceDto>();
+        foreach (DocumentPublication document in documents)
+        {
+            AiProvenanceDto[] rows = rowsByDocument[document.DocumentKey].ToArray();
+            if (rows.Length == 0)
+            {
+                continue;
+            }
 
-        _repository.Insert(rows
-            .Where(x => x.State == (byte)AiProvenanceState.Draft && (x.Culture is null || inScope(x.Culture)))
-            .Select(x => Clone(x, documentKey, AiProvenanceState.Published)));
+            Func<string?, bool> published = CultureFilter(document.Cultures);
+
+            // A culture that the same operation unpublished loses its published marks. Invariant values keep
+            // theirs, because the document stays published, unless every culture was unpublished.
+            bool wholeDocumentUnpublished = document.UnpublishedCultures?.Any(c => c == "*") is true;
+            Func<string?, bool> unpublished = document.UnpublishedCultures is { Count: > 0 }
+                ? CultureFilter(document.UnpublishedCultures)
+                : _ => false;
+
+            bool IsPublished(string? culture) =>
+                wholeDocumentUnpublished is false
+                && (culture is null || (published(culture) && unpublished(culture) is false));
+
+            // Replace the published marks in scope: invariant values are published with every culture.
+            deletes.AddRange(rows
+                .Where(x => x.State == (byte)AiProvenanceState.Published
+                    && (wholeDocumentUnpublished || x.Culture is null || published(x.Culture) || unpublished(x.Culture)))
+                .Select(x => x.Id));
+
+            inserts.AddRange(rows
+                .Where(x => x.State == (byte)AiProvenanceState.Draft && IsPublished(x.Culture))
+                .Select(x => Clone(x, document.DocumentKey, AiProvenanceState.Published)));
+        }
+
+        _repository.Delete(deletes);
+        _repository.Insert(inserts);
 
         scope.Complete();
         return Task.CompletedTask;

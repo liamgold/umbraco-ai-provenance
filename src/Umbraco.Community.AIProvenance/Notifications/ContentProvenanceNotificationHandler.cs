@@ -16,10 +16,11 @@ internal sealed class ContentProvenanceNotificationHandler :
     INotificationAsyncHandler<ContentCopiedNotification>,
     INotificationAsyncHandler<ContentDeletedNotification>
 {
-    private readonly IAiProvenanceService _service;
+    // The concrete service, for its batch publish.
+    private readonly AiProvenanceService _service;
     private readonly PublishedMarksCache _publishedMarksCache;
 
-    public ContentProvenanceNotificationHandler(IAiProvenanceService service, PublishedMarksCache publishedMarksCache)
+    public ContentProvenanceNotificationHandler(AiProvenanceService service, PublishedMarksCache publishedMarksCache)
     {
         _service = service;
         _publishedMarksCache = publishedMarksCache;
@@ -27,19 +28,23 @@ internal sealed class ContentProvenanceNotificationHandler :
 
     public async Task HandleAsync(ContentPublishedNotification notification, CancellationToken cancellationToken)
     {
-        foreach (IContent content in notification.PublishedEntities)
+        // Publishing a branch raises one notification for every document in it, so handle them in one batch.
+        DocumentPublication[] documents = notification.PublishedEntities
+            .Select(content => new DocumentPublication(
+                content.Key,
+                GetPublishedCultures(notification, content),
+                // Unpublishing one culture of a variant document arrives as a publish.
+                notification.UnpublishedCultures?.TryGetValue(content.Key, out IReadOnlyCollection<string>? unpublished) is true
+                    ? unpublished
+                    : null))
+            .ToArray();
+
+        await _service.PublishManyAsync(documents);
+
+        // Umbraco may refresh its content cache before this handler runs, so clear the marks again now.
+        foreach (DocumentPublication document in documents)
         {
-            await _service.PublishAsync(content.Key, GetPublishedCultures(notification, content));
-
-            // Unpublishing one culture of a variant document arrives as a publish.
-            if (notification.UnpublishedCultures?.TryGetValue(content.Key, out IReadOnlyCollection<string>? unpublished) is true
-                && unpublished.Count > 0)
-            {
-                await _service.UnpublishAsync(content.Key, unpublished);
-            }
-
-            // Umbraco may refresh its content cache before this handler runs, so clear the marks again now.
-            _publishedMarksCache.Clear(content.Key);
+            _publishedMarksCache.Clear(document.DocumentKey);
         }
     }
 

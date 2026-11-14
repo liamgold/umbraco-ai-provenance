@@ -105,4 +105,22 @@ public sealed class ContentNotificationTests : AiProvenanceTestBase
             Is.EquivalentTo(new string?[] { null, "en-us" }),
             "Unpublishing Danish removes only the Danish mark.");
     }
+
+    [Test]
+    public async Task Publishing_a_branch_publishes_the_marks_of_every_document_in_it()
+    {
+        await Mark(Textpage.Key, "title");
+        await Mark(Subpage.Key, "title");
+        await Mark(Subpage2.Key, "bodyText");
+
+        ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+
+        Assert.Multiple(async () =>
+        {
+            Assert.That(await Published(Textpage.Key), Has.Count.EqualTo(1));
+            Assert.That(await Published(Subpage.Key), Has.Count.EqualTo(1));
+            Assert.That(await Published(Subpage2.Key), Has.Count.EqualTo(1));
+            Assert.That(await Published(Subpage3.Key), Is.Empty, "An unmarked page gets no marks.");
+        });
+    }
 }
