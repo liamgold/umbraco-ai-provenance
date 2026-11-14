@@ -115,6 +115,8 @@ The website reads the published marks. Preview reads the draft marks.
 
 ## Content Delivery API
 
+The endpoints need Umbraco's Delivery API. Add `.AddDeliveryApi()` to the Umbraco builder in `Program.cs`, and set `Umbraco:CMS:DeliveryApi:Enabled` to `true`. Without them, the endpoints return an error, as Umbraco's own content endpoints do.
+
 The package adds two endpoints beside Umbraco's content endpoints. They return the marked properties of published content:
 
 | Endpoint | Returns |

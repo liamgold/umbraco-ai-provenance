@@ -13,7 +13,7 @@
     <PackageId>Umbraco.Community.AIProvenance</PackageId>
     <Title>AI Provenance</Title>
     <Description>Records where AI was involved in Umbraco content, property by property. Editors mark properties as AI generated or AI modified, and websites and the Delivery API show AI labels.</Description>
-    <PackageTags>umbraco ai ai-provenance ai-disclosure ai-label transparency eu-ai-act</PackageTags>
+    <PackageTags>umbraco umbraco-marketplace ai ai-provenance ai-disclosure ai-label transparency eu-ai-act</PackageTags>
     <Authors>Liam Goldfinch</Authors>
     <Copyright>$([System.DateTime]::UtcNow.ToString(`yyyy`)) © Liam Goldfinch</Copyright>
     <PackageProjectUrl>https://github.com/liamgold/umbraco-ai-provenance</PackageProjectUrl>
