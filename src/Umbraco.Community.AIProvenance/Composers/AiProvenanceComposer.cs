@@ -23,7 +23,8 @@ public sealed class AiProvenanceComposer : IComposer
 
         builder.Services.TryAddSingleton(TimeProvider.System);
         builder.Services.AddSingleton<AiProvenanceRepository>();
-        builder.Services.AddSingleton<IAiProvenanceService, AiProvenanceService>();
+        builder.Services.AddSingleton<AiProvenanceService>();
+        builder.Services.AddSingleton<IAiProvenanceService>(services => services.GetRequiredService<AiProvenanceService>());
         builder.Services.AddSingleton<IAiProvenanceReader, AiProvenanceReader>();
         builder.Services.AddSingleton<PublishedMarksCache>();
 
