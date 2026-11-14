@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Community.AIProvenance.Caching;
 using Umbraco.Community.AIProvenance.Notifications;
 using Umbraco.Community.AIProvenance.Persistence;
 using Umbraco.Community.AIProvenance.Rendering;
@@ -24,12 +25,13 @@ public sealed class AiProvenanceComposer : IComposer
         builder.Services.AddSingleton<AiProvenanceRepository>();
         builder.Services.AddSingleton<IAiProvenanceService, AiProvenanceService>();
         builder.Services.AddSingleton<IAiProvenanceReader, AiProvenanceReader>();
-
+        builder.Services.AddSingleton<PublishedMarksCache>();
 
         builder
             .AddNotificationAsyncHandler<ContentPublishedNotification, ContentProvenanceNotificationHandler>()
             .AddNotificationAsyncHandler<ContentUnpublishedNotification, ContentProvenanceNotificationHandler>()
             .AddNotificationAsyncHandler<ContentCopiedNotification, ContentProvenanceNotificationHandler>()
-            .AddNotificationAsyncHandler<ContentDeletedNotification, ContentProvenanceNotificationHandler>();
+            .AddNotificationAsyncHandler<ContentDeletedNotification, ContentProvenanceNotificationHandler>()
+            .AddNotificationHandler<ContentCacheRefresherNotification, PublishedMarksCacheRefresherHandler>();
     }
 }

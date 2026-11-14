@@ -4,6 +4,7 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Community.AIProvenance.Caching;
 using Umbraco.Community.AIProvenance.Models;
 using Umbraco.Community.AIProvenance.Rendering;
 using Umbraco.Community.AIProvenance.Services;
@@ -44,7 +45,7 @@ public sealed class AiProvenanceReaderTests
         var umbracoContextAccessor = new Mock<IUmbracoContextAccessor>();
         umbracoContextAccessor.Setup(x => x.TryGetUmbracoContext(out context)).Returns(true);
 
-        return new AiProvenanceReader(service.Object, variationContextAccessor.Object, umbracoContextAccessor.Object, AppCaches.NoCache);
+        return new AiProvenanceReader(service.Object, variationContextAccessor.Object, umbracoContextAccessor.Object, AppCaches.NoCache, new PublishedMarksCache(AppCaches.NoCache));
     }
 
     private static Mock<IPublishedContent> Content(Guid key, params (string Alias, ContentVariation Variation)[] properties)

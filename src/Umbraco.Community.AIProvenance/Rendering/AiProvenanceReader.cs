@@ -1,6 +1,7 @@
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Community.AIProvenance.Caching;
 using Umbraco.Community.AIProvenance.Models;
 using Umbraco.Community.AIProvenance.Services;
 using Umbraco.Extensions;
@@ -13,17 +14,20 @@ internal sealed class AiProvenanceReader : IAiProvenanceReader
     private readonly IVariationContextAccessor _variationContextAccessor;
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
     private readonly AppCaches _appCaches;
+    private readonly PublishedMarksCache _publishedMarksCache;
 
     public AiProvenanceReader(
         IAiProvenanceService service,
         IVariationContextAccessor variationContextAccessor,
         IUmbracoContextAccessor umbracoContextAccessor,
-        AppCaches appCaches)
+        AppCaches appCaches,
+        PublishedMarksCache publishedMarksCache)
     {
         _service = service;
         _variationContextAccessor = variationContextAccessor;
         _umbracoContextAccessor = umbracoContextAccessor;
         _appCaches = appCaches;
+        _publishedMarksCache = publishedMarksCache;
     }
 
     public AiOrigin GetOrigin(IPublishedContent content, string propertyAlias, string? culture = null, string? segment = null) =>
@@ -98,11 +102,19 @@ internal sealed class AiProvenanceReader : IAiProvenanceReader
     }
 
     /// <summary>
-    /// Gets a document's marks once per request, so a page with many labels reads the database once.
+    /// Gets a document's marks. Published marks come from a cache that lasts across requests. Draft marks, which
+    /// only preview shows, are read once per request.
     /// </summary>
     private IReadOnlyCollection<AiProvenanceMark> GetMarks(Guid documentKey, bool? preview)
     {
         AiProvenanceState state = (preview ?? IsWebsitePreview()) ? AiProvenanceState.Draft : AiProvenanceState.Published;
+
+        if (state == AiProvenanceState.Published)
+        {
+            return _publishedMarksCache.Get(
+                documentKey,
+                () => _service.GetMarksAsync(documentKey, state).GetAwaiter().GetResult());
+        }
 
         return _appCaches.RequestCache.GetCacheItem(
                    $"AiProvenance.Marks.{documentKey}.{state}",
