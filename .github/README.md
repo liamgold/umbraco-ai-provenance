@@ -50,6 +50,8 @@ The document's **Info** view lists every marked property.
 
 The actions appear on text, rich text, Markdown, tags, code, block, media, upload and link properties. To add them to other property editors, such as a third-party editor, list the editors' UI aliases in the `AIProvenance:AdditionalPropertyEditorUis` setting (see [Configuration](#configuration)).
 
+The backoffice text is in English, Danish, Dutch, French and German, following each user's backoffice language. Other languages show English. To add or correct a translation, edit the files in [`Client/src/localization`](../src/Umbraco.Community.AIProvenance/Client/src/localization).
+
 ## Show AI labels on your website
 
 ![AI labels on a website: a heading marked AI modified, and a summary and body text marked AI generated](https://raw.githubusercontent.com/liamgold/umbraco-ai-provenance/main/docs/screenshots/website-labels.png)

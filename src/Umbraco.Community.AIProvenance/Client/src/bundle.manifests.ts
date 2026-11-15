@@ -16,4 +16,34 @@ export const manifests: Array<UmbExtensionManifest> = [
     meta: { culture: "en" },
     js: () => import("./localization/en.js"),
   },
+  // Base culture codes, as Umbraco uses for its own translations. A regional backoffice language, such as
+  // da-DK, falls back to its base language, and any other language falls back to English.
+  {
+    type: "localization",
+    alias: "AiProvenance.Localization.Da",
+    name: "AI Provenance Danish",
+    meta: { culture: "da" },
+    js: () => import("./localization/da.js"),
+  },
+  {
+    type: "localization",
+    alias: "AiProvenance.Localization.De",
+    name: "AI Provenance German",
+    meta: { culture: "de" },
+    js: () => import("./localization/de.js"),
+  },
+  {
+    type: "localization",
+    alias: "AiProvenance.Localization.Fr",
+    name: "AI Provenance French",
+    meta: { culture: "fr" },
+    js: () => import("./localization/fr.js"),
+  },
+  {
+    type: "localization",
+    alias: "AiProvenance.Localization.Nl",
+    name: "AI Provenance Dutch",
+    meta: { culture: "nl" },
+    js: () => import("./localization/nl.js"),
+  },
 ];
