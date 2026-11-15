@@ -26,16 +26,18 @@ export class AipDocumentMarksContext extends UmbContextBase {
   constructor(host: UmbControllerHost) {
     super(host, AIP_DOCUMENT_MARKS_CONTEXT);
 
+    // The saved copy of the document changes when it loads, and again after each save or publish. A save can set
+    // marks on the server, for example when the Umbraco.AI add-on marks a value the Copilot wrote, so reload then.
     this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (workspace) => {
       this.observe(
-        workspace?.unique,
-        (unique) => {
-          if (unique && unique !== this.#documentKey) {
-            this.#documentKey = unique;
+        workspace?.persistedData,
+        (persisted) => {
+          if (persisted?.unique) {
+            this.#documentKey = persisted.unique;
             this.reload();
           }
         },
-        "observeDocumentUnique",
+        "observePersistedDocument",
       );
     });
   }

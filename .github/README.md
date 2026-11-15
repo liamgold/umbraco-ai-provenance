@@ -153,10 +153,10 @@ With `Umbraco.Community.AIProvenance.UmbracoAI` installed, the package marks eac
 
 The mark records the AI provider and model. It covers two ways that Umbraco.AI changes content:
 
-- **The Copilot chat.** When a page is open, the Copilot usually changes it in the editor with its `set_value` tool, and the editor then saves. The add-on remembers each value the Copilot proposes, and marks the property when the editor saves that value.
+- **The Copilot chat.** When a page is open, the Copilot usually changes it in the editor with its `set_value` tool, and the page is then saved, by the editor or by the Copilot. The add-on remembers each value the Copilot proposes, and marks the property when that value is saved. The mark shows as soon as the page is saved.
 - **Agents that save content on the server,** such as Automate workflows that are allowed to change content, and agents called from code. Every value such an agent changes is marked.
 
-For the Copilot, the add-on only marks a value that the editor saved as the AI wrote it:
+For the Copilot, the add-on only marks a value that was saved as the AI wrote it:
 
 - A value the editor rewrote before saving is the editor's, so it isn't marked.
 - Rich text is compared on its text, so formatting changes don't stop a match.
