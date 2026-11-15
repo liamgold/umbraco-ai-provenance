@@ -78,7 +78,9 @@ An `AiGenerated` mark never changes to `AiModified` automatically.
 
 The add-on compares whole property values. When an agent changes a property inside a block, the add-on marks the block property as a whole, not the property inside the block.
 
-When an editor applies a prompt suggestion, Umbraco.AI changes the value in the browser and fires no event. The package cannot detect this in a supported way, so editors mark these properties themselves. The extension point that would fix this is in [`discovery.md`](discovery.md#proposed-umbracoai-extension-points), as a proposal for Umbraco.AI.
+The Copilot chat usually changes the open page in the browser instead, with its `set_value` tool, and the editor saves afterwards. That save has no AI context. The add-on therefore remembers each value the Copilot proposes, through a chat middleware that sees the tool call on the server. When the editor saves, a changed value that matches a proposal to the same editor is marked like an agent write. A proposal is kept in memory for an hour. Umbraco's load-balancing setup runs the backoffice on one server, so the proposal and the save reach the same server. The match compares the text, so formatting changes don't stop it, but a value the editor rewrote is not marked.
+
+When an editor applies a prompt suggestion, Umbraco.AI changes the value in the browser too. The add-on doesn't mark these yet. Prompts live in a separate Umbraco.AI package, and issue #2 describes how the same approach could cover them. The extension point that would cover every route is in [`discovery.md`](discovery.md#proposed-umbracoai-extension-points), as a proposal for Umbraco.AI.
 
 ### Marks follow the content
 
