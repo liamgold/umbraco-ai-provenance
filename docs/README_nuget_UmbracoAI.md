@@ -13,7 +13,7 @@ An add-on for [`Umbraco.Community.AIProvenance`](https://www.nuget.org/packages/
 
 Each mark records the AI provider and model.
 
-It works for agents in the Copilot chat, and for Automate workflows that are allowed to change content. Prompt suggestions that an editor applies in the browser are not marked automatically, because Umbraco.AI raises no event for them.
+It covers the Copilot chat: when the Copilot changes the open page and the editor saves the value as the AI wrote it, the property is marked. It also covers agents that save content on the server, such as Automate workflows that are allowed to change content. Prompt suggestions that an editor applies aren't marked yet.
 
 Requires Umbraco 17.8.1 or later and Umbraco.AI 17.8 or later.
 

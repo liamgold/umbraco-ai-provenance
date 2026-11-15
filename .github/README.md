@@ -151,9 +151,20 @@ With `Umbraco.Community.AIProvenance.UmbracoAI` installed, the package marks eac
 - A value that had content becomes **AI modified**.
 - An AI generated mark never changes to AI modified automatically.
 
-The mark records the AI provider and model. It works for agents in the Copilot chat and for Automate workflows that are allowed to change content.
+The mark records the AI provider and model. It covers two ways that Umbraco.AI changes content:
 
-When an editor applies a prompt suggestion, Umbraco.AI changes the value in the browser and raises no event. The package cannot detect this, so editors mark these properties themselves. See [Proposed Umbraco.AI extension points](../docs/discovery.md#proposed-umbracoai-extension-points).
+- **The Copilot chat.** When a page is open, the Copilot usually changes it in the editor with its `set_value` tool, and the editor then saves. The add-on remembers each value the Copilot proposes, and marks the property when the editor saves that value.
+- **Agents that save content on the server,** such as Automate workflows that are allowed to change content, and agents called from code. Every value such an agent changes is marked.
+
+For the Copilot, the add-on only marks a value that the editor saved as the AI wrote it:
+
+- A value the editor rewrote before saving is the editor's, so it isn't marked.
+- Rich text is compared on its text, so formatting changes don't stop a match.
+- A proposal waits up to one hour for the save. A site restart in between forgets it.
+- Only `set_value` is covered. Adding, removing or moving blocks with the Copilot isn't marked.
+- The add-on reads the Copilot's `set_value` tool, which belongs to Umbraco.AI. It was tested with `Umbraco.AI.Agent.Copilot` 17.2.1.
+
+Prompt suggestions that an editor applies, from a property action or the rich text toolbar, aren't marked yet. Editors mark these properties themselves. See [#2](https://github.com/liamgold/umbraco-ai-provenance/issues/2).
 
 ## Notifications
 
